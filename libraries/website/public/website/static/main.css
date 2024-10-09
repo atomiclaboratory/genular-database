@@ -1,0 +1,373 @@
+html,
+body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+code,
+kbd,
+pre,
+samp {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    font-size: 1em;
+}
+
+header {
+    border-bottom: 1px solid rgba(243, 244, 246, 0.5);
+    background-color: rgb(250 251 252);
+}
+
+md-block:not([rendered]) {
+    display: none;
+}
+
+#expressionChart {
+    width: 100% !important; /* Only if necessary */
+}
+
+section.full-screen-section-details {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#searchResults {
+    overflow-y: hidden;
+}
+
+.searchResultsTextarea {
+    display: none;
+}
+
+#jsoncrackEmbed {
+    flex: 1;
+    order: 2;
+    border: none;
+    padding: 15px;
+}
+
+/* Ensure the loader is confined to the details_schema section */
+#details_schema {
+    position: relative; /* This makes it the reference point for the absolute positioning below */
+    z-index: 1; /* Optional: ensures it has higher stacking context than normal content */
+}
+
+/* Loader Overlay Styles */
+#loaderOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2; /* Ensure the overlay is above the content it covers */
+}
+
+.loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.navbar {
+    font-family: "Courier New", Courier, monospace;
+}
+
+#introduction {
+    position: relative;
+    overflow: hidden;
+}
+
+#stats {
+    font-family: "Courier New", Courier, monospace;
+    color: #000;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.card-body {
+    color: #000;
+}
+
+#string_canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+#introduction .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Base styles for the loading bar container */
+.loading-bar {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to stay in view */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center; /* Center horizontally and vertically */
+    align-items: center; /* Center children horizontally */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    z-index: 9999; /* High z-index to be on top of other content */
+    text-align: center; /* Center text horizontally */
+}
+
+/* Styles specific to the SVG loading image */
+.loading-bar img {
+    width: 100px; /* Set the width as needed */
+    height: auto; /* Adjust height automatically to maintain aspect ratio */
+}
+
+/* Styles for the loading text */
+.loading-text {
+    color: #fff; /* White text color */
+    font-size: 16px; /* Set font size */
+    margin: 0; /* Remove default margin */
+    animation: fadeInOut 3s ease-in-out infinite;
+}
+@keyframes fadeInOut {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+.github-corner {
+    fill: #151513;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    border: 0;
+    right: 0;
+    z-index: 1000;
+}
+.github-corner:hover .octo-arm {
+    animation: octocat-wave 560ms ease-in-out;
+}
+@keyframes octocat-wave {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    20%,
+    60% {
+        transform: rotate(-25deg);
+    }
+    40%,
+    80% {
+        transform: rotate(10deg);
+    }
+}
+@media (max-width: 500px) {
+    .github-corner:hover .octo-arm {
+        animation: none;
+    }
+    .github-corner .octo-arm {
+        animation: octocat-wave 560ms ease-in-out;
+    }
+}
+
+@media (max-width: 500px) {
+    .github-corner:hover .octo-arm {
+        animation: none;
+    }
+
+    .github-corner .octo-arm {
+        animation: octocat-wave 560ms ease-in-out;
+    }
+}
+.select2-results__option span {
+    display: inline-block; /* Allows the application of width and overflow properties */
+    max-width: calc(100% - 25px); /* Set max-width accounting for margin and padding */
+    white-space: nowrap; /* Ensures the text is on a single line */
+    overflow: hidden; /* Clips the text to fit within the container */
+    text-overflow: ellipsis; /* Display ellipsis ('...') to represent clipped text */
+    vertical-align: top; /* Aligns the text top if needed */
+}
+
+.main {
+    flex: 1 0 auto;
+    scroll-behavior: smooth;
+}
+
+.full-screen-section {
+    position: relative;
+}
+
+.card-stats {
+    font-size: 9px;
+    float: right;
+}
+
+.footer {
+    flex-shrink: 0;
+    border-top: 1px solid rgba(243, 244, 246, 0.5);
+    background-color: rgb(250 251 252);
+}
+
+.shadow-3xl {
+    --tw-shadow: 7px 7px 15px 0 #000;
+    --tw-shadow-colored: 7px 7px 15px 0 var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.heartbeat-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0.1;
+}
+
+.heartbeat-line svg {
+    width: 100%;
+    height: 100%;
+}
+
+.heartbeat-line path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: heartbeat 500s linear 1;
+}
+
+#searchDescription {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: right;
+}
+.dt-buttons {
+    margin-bottom: 15px;
+}
+
+@keyframes heartbeat {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Popover Container */
+.popover-explore-details {
+    max-height: 250px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+}
+
+/* Remove default list styles */
+.popover-explore-details ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Style list items */
+.popover-explore-details li {
+    padding: 8px 12px; /* Add padding inside list items */
+    border-bottom: 1px solid #e0e0e0; /* Light border between items */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0;
+}
+
+/* Remove border from the last item */
+.popover-explore-details li:last-child {
+    border-bottom: none;
+}
+
+/* Hover effect on list items */
+.popover-explore-details li:hover {
+    background-color: #f9f9f9;
+}
+.watermarked-text {
+    position: relative;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.watermarked-text::after {
+    content: "LLM GENERATED";
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for label */
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    z-index: 1; /* In front of the watermark */
+    pointer-events: none;
+    border-radius: 3px;
+}
+
+.badge {
+    white-space: nowrap;
+}
+
+#wordCloudCanvas {
+    max-width: 800px;
+    max-height: 400px;
+    width: 100%;
+    height: 400px;
+}
+
+.word-cloud-wrapper {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+}
+
+@media (max-width: 576px) {
+    .word-cloud-wrapper {
+        max-width: 100%;
+    }
+}
+
+.formatted-sequence {
+    font-family: monospace;
+    background-color: #f8f9fa; /* Light gray background */
+    padding: 10px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap; /* Ensures line breaks are preserved */
+}

@@ -1,0 +1,12 @@
+links.json
+gathered_data_bash
+links.old.json
+gathered_data.sh
+allGenes.processed.json
+allGenes.processed.first.json
+bulk
+
+output/*.json
+output/genes/*
+data.cells.json
+data.processed.json

@@ -1,0 +1,34 @@
+{
+  "name": "cellxgene-data-processing",
+  "version": "1.0.0",
+  "description": "Scripts for downloading, processing, and integrating single-cell data from cellXgene.",
+  "main": "index.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atomiclaboratory/genular-database"
+  },
+  "keywords": [
+    "cellxgene",
+    "single-cell",
+    "data-processing",
+    "bioinformatics"
+  ],
+  "author": "Ivan Tomic <info@ivantomic.com>",
+  "bugs": {
+    "url": "https://github.com/atomiclaboratory/genular-database/issues"
+  },
+  "homepage": "https://genular.atomic-lab.org",
+  "license": "MIT",
+  "dependencies": {
+    "@stdlib/stats-chi2test": "^0.1.0",
+    "axios": "^1.6.2",
+    "big-json": "^3.2.0",
+    "json-stream-stringify": "^3.0.1",
+    "mariadb": "^3.2.3",
+    "mongodb": "^6.2.0",
+    "node-fetch": "^3.3.1",
+    "puppeteer": "^19.7.0",
+    "sync-request": "^6.1.0"
+  }
+}

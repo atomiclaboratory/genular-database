@@ -1,0 +1,9 @@
+/* TEAM */
+Ivan Tomic, Adriana Tomic
+
+/* THANKS */
+Special thanks to all contributors and supporters!
+
+/* SITE */
+Language: English
+Doctype: HTML5

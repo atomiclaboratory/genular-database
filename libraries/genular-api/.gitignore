@@ -1,0 +1,7 @@
+*.tar.gz
+
+build_R_package.R
+genular.Rcheck
+manual.pdf
+.RData
+.Rhistory

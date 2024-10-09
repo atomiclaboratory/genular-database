@@ -1,0 +1,6 @@
+# .gitignore
+.env
+vendor
+composer.lock
+storage/ratelimits.json
+storage/

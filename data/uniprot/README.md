@@ -1,0 +1,3 @@
+# UniProt Data Downloader
+
+This script is designed to automate the download and extraction of essential UniProt datasets: `uniprot_sprot.xml`, `uniprot_trembl.xml`, and `idmapping_selected.tab`. It ensures these files are retrieved only if they are not already available in the `./bulk` directory, preventing unnecessary network usage and ensuring your local dataset remains current. This utility is particularly useful for bioinformatics professionals who require consistent access to UniProt data for their analyses. Execute the script after cloning the repository to maintain an up-to-date collection of UniProt resources.

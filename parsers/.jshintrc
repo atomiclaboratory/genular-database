@@ -1,0 +1,25 @@
+{
+    "camelcase": true,
+    "eqeqeq": true,
+    "immed": true,
+    "latedef": false,
+    "noarg": true,
+    "nonbsp": true,
+    "undef": true,
+    "unused": true,
+    "trailing": true,
+    "maxparams": 5,
+    "maxlen": 120,
+    "indent": 4,
+    "browser": false,
+    "node": true,
+    "laxbreak": true,
+    "globals": {
+        "console": true,
+        "expect": true,
+        "describe": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "sinon": true,
+    }
+}

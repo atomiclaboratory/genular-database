@@ -1,0 +1,35 @@
+{
+  "name": "genular-database",
+  "version": "1.0.6",
+  "description": "Genular top level gene databank processor",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Warning: Tests need to be implemented!\" && exit 1"
+  },
+  "author": "LogIN- <info@ivantomic.com> (https://github.com/LogIN-)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atomiclaboratory/genular-database"
+  },
+  "bugs": {
+    "url": "https://github.com/atomiclaboratory/genular-database/issues"
+  },
+  "private": true,
+  "os": [
+    "linux"
+  ],
+  "dependencies": {
+    "bson": "^4.2.2",
+    "cli-color": "^2.0.0",
+    "dotenv": "^16.4.5",
+    "event-stream": "^4.0.1",
+    "mkdirp": "^1.0.4",
+    "mongodb": "^4.13.0",
+    "mysql": "^2.18.1",
+    "stream-chain": "^2.2.5",
+    "stream-json": "^1.7.5",
+    "xml-beautifier": "^0.4.3",
+    "xml2js-parser": "^1.1.1"
+  }
+}
