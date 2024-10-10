@@ -59,11 +59,11 @@ API_KEY <- "3147dda5fa023c9763d38bddb472dd28"
 # Define the query values for cell type suggestions
 queryValues <- c("endothelial cell", "T cell")
 # Use the cells_suggest function to get relevant cell type matches
-cell_suggest_results <- cells_suggest(queryValues,
+search_example_1 <- cells_suggest(queryValues,
                                         options = list(api_key = API_KEY, timeout = 5000)
                                       )
 # Display the suggested cell types
-# print(head(cell_suggest_results))
+# print(head(search_example_1))
 ```
 
 ## Example 2: Searching Cell Information Based on Query Conditions
@@ -89,7 +89,7 @@ fieldsFilter <- c(
 )
 
 # Perform the cell search
-cell_search_results <- cells_search(
+search_example_2 <- cells_search(
   queryValues, 
   fieldsFilter,
   page = 1,
@@ -102,7 +102,7 @@ cell_search_results <- cells_search(
   options = list(api_key = "3147dda5fa023c9763d38bddb472dd28", timeout = 10000)
 )
 # Display the results
-# print(head(cell_search_results))
+print(head(sapply(search_example_2$content$results, function(x) x$symbol)))
 ```
 
 ## Example 3: Searching for Gene Information
@@ -117,11 +117,11 @@ fieldsFilter <- c("geneID", "symbol", "crossReference.enseGeneID")
 organismType = c(9606)
 
 # Perform the gene search
-gene_search_results <- gene_search(queryFields, queryValues, fieldsFilter, searchType = searchType,
+search_example_3 <- gene_search(queryFields, queryValues, fieldsFilter, searchType = searchType,
                                     organismType = organismType, page = 1, limit = 10,
                                     options = list(api_key = API_KEY, timeout = 1000))
 # Display the results
-# print(head(gene_search_results))
+print(head(sapply(search_example_3$content$results, function(x) x$symbol)))
 ```
 
 ## Example 4: Suggesting Pathway Matches Based on Query Values
@@ -131,9 +131,9 @@ gene_search_results <- gene_search(queryFields, queryValues, fieldsFilter, searc
 # Define the query values for pathway suggestion
 queryValues <- c("apoptosis", "signal transduction")
 # Use the pathways_suggest function to get relevant pathway matches
-pathway_suggest_results <- pathways_suggest(queryValues)
+search_example_4 <- pathways_suggest(queryValues)
 # Display the suggested pathways
-# print(head(pathway_suggest_results))
+print(head(sapply(search_example_4$results, function(x) x$term)))
 ```
 
 ## Example 5: Gene Expression Feature Engineering (Pathway-Level Features / PathwayGeneScore)
@@ -182,7 +182,7 @@ input_data_filtered <- input_data_counts[, important_variables]
 
 ### Fetch gene-related data from genular database
 # Using `fetch_all_gene_search_results()`, we query gene information for the given symbols in `input_data`
-all_gene_results <- fetch_all_gene_search_results(
+search_example_5 <- fetch_all_gene_search_results(
   queryFields = list(c("symbol")),  # Specify that the query is based on gene symbols
   queryValues = colnames(input_data_filtered),  # Gene symbols extracted from the column names of 'input_data'
   fieldsFilter = c("geneID", "symbol", "crossReference.enseGeneID", 
@@ -199,13 +199,13 @@ all_gene_results <- fetch_all_gene_search_results(
   options = list(api_key = API_KEY, timeout = 1000)  # API key and timeout for the request
 )
 
-all_gene_symbols <- sapply(all_gene_results, function(x) x$symbol)
+all_gene_symbols <- sapply(search_example_5, function(x) x$symbol)
 gene_not_found <- setdiff(colnames(input_data_filtered), all_gene_symbols)
 input_data_filtered <- input_data_filtered[, setdiff(colnames(input_data_filtered), gene_not_found)]
 
 ## Transform and restructure the fetched gene-related data
 # The `extract_data()` function helps map various gene attributes to a more usable format
-data_transposed <- extract_data(all_gene_results, list(
+data_transposed <- extract_data(search_example_5, list(
     "geneID" = "mappedGeneID",  # Mapping gene IDs
     "symbol" = "mappedSymbol",  # Mapping gene symbols
     "crossReference$enseGeneID" = "mappedEnseGeneID",  # Mapping Ensembl gene IDs
