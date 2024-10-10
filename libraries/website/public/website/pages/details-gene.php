@@ -470,7 +470,7 @@ lastVisitedPageCache('gene-details', [
                 <div class="text-left">
                     <h2>Database document:</h2>
                         <p id="searchDescription" class="mt-2" style="text-align: left;">
-                            Only first some of the entries are kept for 'singleCellExpressions', 'mRNAExpressions' and other large data arrays for visualization purposes.
+                            Only the first few entries are kept for 'singleCellExpressions,' 'mRNAExpressions,' and other large data arrays for visualization purposes.
                         </p>
                 </div>
             </div>
@@ -606,13 +606,15 @@ if (isset($geneDetailsSchema['singleCellExpressions']['effectSizes']) && !empty(
     <?php if (isset($geneDetailsSchema) && $geneDetailsSchema !== ''): ?>
         <?php
 
-            if (strlen(json_encode($geneDetailsSchema)) > 50000) {
-                trimArrays($geneDetailsSchema, 50);
+            $schemaToLarge = 20000;
+
+            if (strlen(json_encode($geneDetailsSchema)) > $schemaToLarge) {
+                trimArrays($geneDetailsSchema, 10);
             }
 
             echo 'const geneDetailsSchema = ' . json_encode(json_encode($geneDetailsSchema)) . ';';
 
-            if (strlen(json_encode($geneDetailsSchema)) > 40000) {
+            if (strlen(json_encode($geneDetailsSchema)) > $schemaToLarge) {
                 echo 'const geneDetailsSchemaLarge = true;';
             } else {
                 echo 'const geneDetailsSchemaLarge = false;';
