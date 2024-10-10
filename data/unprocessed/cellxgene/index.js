@@ -25,7 +25,10 @@ if (currentModuleDir !== "/mnt/data/projects/atomic/data/unprocessed/cellxgene")
 }
 
 console.log("Starting cellxgene. isHeadless: " + isHeadless);
-const maxRetries = 3;
+
+const maxRetries = 5; // Max retry attempts
+const retryDelay = 2000; // Delay between retries (2 seconds)
+const timeout = 6 * 60 * 60 * 1000; // Timeout for download (6 hours)
 
 (async () => {
     const regex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g;
@@ -77,6 +80,7 @@ const maxRetries = 3;
         console.log("===> Opening " + i + " collection: " + collection_id);
         console.log("===> URL:  " + collections[i]);
 
+
         await page.goto(collections[i], { waitUntil: "networkidle2" });
         await autoScroll(page);
         await page.waitForSelector('[data-testid="dataset-download-button"]');
@@ -87,12 +91,13 @@ const maxRetries = 3;
         for (const overlay of buttons) {
             m_c++;
 
-            console.log("Opening " + m_c + " modal");
+            console.log("==> Opening " + m_c + " dataset modal");
             await overlay.hover();
             await overlay.click();
 
             await page.waitForNetworkIdle();
 
+            // 1 - Wait for dataset download modal
             try {
                 await page.waitForFunction(() => document.querySelector(".MuiDialogContent-root"), { timeout: 10000 });
             } catch (error) {
@@ -100,6 +105,7 @@ const maxRetries = 3;
                 continue;
             }
 
+            // 2 - Click on H5AD input (<input class="PrivateSwitchBase-input css-1m9pwf3" name="dataFormat" type="radio" value="H5AD">)
             try {
                 let button = await page.waitForSelector('input[value="H5AD"]', { visible: true, timeout: 10000 });
                 // Click the button and wait for the AJAX request to complete
@@ -109,7 +115,7 @@ const maxRetries = 3;
                             timeout: 10000,
                         })
                         .then((response) => {
-                            console.log("Response URL:", response.url());
+                            console.log("Ajax response URL:", response.url());
                         }),
                     button.click(),
                 ]);
@@ -137,24 +143,31 @@ const maxRetries = 3;
 
             let extensions = ["json", "h5ad", "error"];
             let datasetExists = false;
-            let dataset_check;
 
-            for (let extension of extensions) {
-                dataset_check = "./bulk/" + dataset_id + "." + extension;
-                if (fs.existsSync(dataset_check)) {
-                    console.log("===> Dataset (" + extension + ") already exists: " + dataset_check);
-                    datasetExists = true;
-                    break;
-                } else {
-                    console.log("===> Dataset does not exist: " + dataset_check);
+            // Check if any file in the "./bulk/" directory starts with the dataset_id
+            const bulkFiles = fs.readdirSync("./bulk/");
+            const matchingFiles = bulkFiles.filter((file) => file.startsWith(dataset_id));
+
+            if (matchingFiles.length > 0) {
+                console.log(`===> Dataset already exists with matching file(s): ${matchingFiles.join(", ")}`);
+                datasetExists = true;
+            } else {
+                // Continue with individual extension checks
+                for (let extension of extensions) {
+                    let dataset_check = `./bulk/${dataset_id}.${extension}`;
+                    if (fs.existsSync(dataset_check)) {
+                        console.log(`===> Dataset (${extension}) already exists: ${dataset_check}`);
+                        datasetExists = true;
+                        break;
+                    } else {
+                        console.log(`===> Dataset does not exist: ${dataset_check}`);
+                    }
                 }
             }
 
-            if (datasetExists) {
-                // Use XPath to target the button with the exact class and text "Cancel"
-                const cancelButtons = await page.$x(
-                    "//div[contains(@class, 'bp4-dialog-footer')]//button[contains(@class, 'bp4-button') and contains(@class, 'bp4-minimal') and normalize-space(.)='Cancel']"
-                );
+            if (datasetExists === true) {
+                // Cancel the modal and proceed to next datasets
+                const cancelButtons = await page.$x("//button[normalize-space(text())='Cancel']");
 
                 if (cancelButtons.length > 0) {
                     await cancelButtons[0].click();
@@ -164,6 +177,7 @@ const maxRetries = 3;
                     console.log("===> Cancel button not found");
                 }
 
+                console.log("===> Skipping dataset_id / exists: " + dataset_id);
                 continue;
             }
 
@@ -173,7 +187,7 @@ const maxRetries = 3;
                 download_text: inner_html,
             };
 
-            console.log("===> Final datasets: ", final_dataset);
+            console.log("===> Final datasets for download (log): ", final_dataset);
 
             gathered_data_bash += inner_html + "\r\n";
             gathered_data.push(final_dataset);
@@ -181,17 +195,17 @@ const maxRetries = 3;
             let cmd_clean = inner_html.replace("curl -o local.h5ad", "curl -o " + currentModuleDir + "/bulk/" + dataset_id + ".h5ad");
             cmd_clean = cmd_clean + " > /dev/null 2>&1";
 
-            //console.log("===> Downloading file (cmd_clean): " + cmd_clean);
+            console.log("===> Final datasets for download (URL): " + cmd_clean);
 
             const url = extractURL(cmd_clean);
             const filePath = currentModuleDir + "/bulk/" + dataset_id + ".h5ad";
-
-            console.log("===> Downloading file: " + url);
 
             if (url === null) {
                 console.error("Failed to extract URL from command:", cmd_clean);
                 continue;
             }
+
+            console.log("===> Final datasets for download (URL): " + url);
 
             try {
                 await downloadFile(url, filePath, maxRetries);
@@ -201,21 +215,23 @@ const maxRetries = 3;
             }
 
             try {
-                // Wait for the Cancel button using a CSS selector and a generous timeout
-                await page.waitForSelector("button.MuiButton-root", { visible: true, timeout: 5000 });
-                
-                // Find the Cancel button using its text
-                const buttons = await page.$$("button.MuiButton-root");
+                // Wait for the button elements to be visible with a generous timeout
+                await page.waitForSelector("button", { visible: true, timeout: 5000 });
+
+                // Find all buttons on the page
+                const buttons = await page.$$("button");
                 let cancelButton = null;
 
+                // Iterate through the buttons and check their inner text
                 for (const button of buttons) {
-                    const buttonText = await button.evaluate(node => node.innerText.trim());
+                    const buttonText = await button.evaluate((node) => node.innerText.trim());
                     if (buttonText === "Cancel") {
                         cancelButton = button;
                         break;
                     }
                 }
 
+                // If the Cancel button is found, click it
                 if (cancelButton) {
                     await cancelButton.click();
                     await page.waitForTimeout(150);
@@ -261,21 +277,42 @@ async function autoScroll(page) {
 
 async function downloadFile(url, filePath, retries) {
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to download: ${response.statusText}`);
-        }
+        console.log(`===> Downloading file: ${url} with ${retries} retries left...`);
 
+        const response = await fetchWithTimeout(url, 30000);
         const writer = fs.createWriteStream(filePath);
         await pipeline(response.body, writer);
+
         console.log("File downloaded successfully");
     } catch (error) {
         if (retries === 0) {
+            console.error(`Exhausted retries. Last error: ${error.message}`);
             throw error;
         }
-        console.log(`Retrying download... (${maxRetries - retries + 1}/${maxRetries})`);
+
+        console.error(`Download failed: ${error.message}. Retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await downloadFile(url, filePath, retries - 1);
     }
+}
+
+async function fetchWithTimeout(url, timeout) {
+    const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), timeout)
+    );
+
+    const fetchPromise = fetch(url);
+
+    return Promise.race([fetchPromise, timeoutPromise])
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to download: ${response.statusText}`);
+            }
+            return response;
+        })
+        .catch(error => {
+            throw new Error(`Fetch failed: ${error.message}`);
+        });
 }
 
 function extractURL(command) {
@@ -286,7 +323,6 @@ function extractURL(command) {
     }
     return null;
 }
-
 
 function sleep(ms) {
     return new Promise((resolve) => {
