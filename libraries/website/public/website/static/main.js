@@ -189,13 +189,11 @@ $(document).ready(function () {
                     redirectUrl = WEB_URL + "/details-cell/" + firstItem.id;
                 }
 
-
                 showLoadingBar();
 
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = redirectUrl;
                 }, 1000);
-
             }, 200); // Delay of 200ms
 
             // // Check if there are no selected items
@@ -329,7 +327,6 @@ $(document).ready(function () {
                 idsContainer.append('<span class="badge badge-info mr-2 mb-2">' + id + "</span>");
             });
         });
-
     }
 
     if (typeof effectSizesData !== "undefined" && effectSizesData.length > 0) {
@@ -378,8 +375,6 @@ $(document).ready(function () {
         // renderWordCloud();
     }
 });
-
-
 
 function renderWordCloud() {
     // Get the context of the canvas element
@@ -655,6 +650,17 @@ function plotCellTreemapSingle() {
     });
 }
 
+function copyHoverContent(type) {
+    const hoverText = document.getElementById(`hover-content-${type}`).innerText;
+    const tempInput = document.createElement("textarea");
+    tempInput.value = hoverText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("Copied to clipboard!");
+}
+
 function plotGeneTreemapSingle() {
     showLoadingBar();
     if (!Array.isArray(effectSizesData) || effectSizesData.length === 0) {
@@ -673,16 +679,19 @@ function plotGeneTreemapSingle() {
         labels: labels,
         parents: parents,
         values: values,
-        textinfo: "label+value",
+        textinfo: "label+value+percent entry",
+        hoverinfo: "label+value+text",
+        hovertemplate: "<b>%{label}</b><br>" + "Fold Change: %{value}<br>" + "Marker Score: %{text}<extra></extra>", // Customize hover tooltip
         marker: {
             colorscale: "Cividis",
-            colors: values, // Color based on foldChange
+            colors: values,
             showscale: true,
             colorbar: {
-                title: "Fold Change", // Update colorbar title
+                title: "Fold Change",
                 titleside: "right",
             },
         },
+        text: effectSizesData.map((d) => d.markerScore), // Include marker score for hover
     };
 
     const layout = {
@@ -695,8 +704,10 @@ function plotGeneTreemapSingle() {
     };
 
     const config = {
+        responsive: true,
+        scrollZoom: true,
         toImageButtonOptions: {
-            format: "svg", // one of png, svg, jpeg, webp
+            format: "svg",
             filename: "genular_export",
             height: 1024,
             width: 768,
@@ -706,6 +717,25 @@ function plotGeneTreemapSingle() {
 
     Plotly.newPlot("gene-treemap-single", [trace], layout, config).then(() => {
         hideLoadingBar();
+    });
+
+    // Listen for hover events on the treemap
+    const geneTreemapDiv = document.getElementById("gene-treemap-single");
+    geneTreemapDiv.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0];
+
+        // Extract data for hover information
+        const cellName = pointData.label;
+        const foldChange = pointData.value;
+        const markerScore = pointData.text;
+
+        // Update the hover-info div with the hovered data
+        const hoverContent = `
+            <b>Cell Name:</b> ${cellName}<br>
+            <b>Fold Change:</b> ${foldChange}<br>
+            <b>Marker Score:</b> ${markerScore}
+        `;
+        document.getElementById("hover-content-single").innerHTML = hoverContent;
     });
 }
 
@@ -803,6 +833,19 @@ function plotGeneTreemapGrouped() {
     Plotly.newPlot("gene-treemap-grouped", [trace], layout, config).then(() => {
         hideLoadingBar();
     });
+
+    const geneTreemapDivGrouped = document.getElementById("gene-treemap-grouped");
+    geneTreemapDivGrouped.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0];
+        const groupName = pointData.label;
+        const foldChange = pointData.value;
+
+        const hoverContent = `
+            <b>Group Name:</b> ${groupName}<br>
+            <b>Sum of Fold Change:</b> ${foldChange}
+        `;
+        document.getElementById("hover-content-grouped").innerHTML = hoverContent;
+    });
 }
 
 function plotGeneTreemapGroupedDetails() {
@@ -845,6 +888,19 @@ function plotGeneTreemapGroupedDetails() {
 
     Plotly.newPlot("gene-treemap-grouped-details", [trace], layout, config).then(() => {
         hideLoadingBar();
+    });
+
+    const geneTreemapDivGroupedDetails = document.getElementById("gene-treemap-grouped-details");
+    geneTreemapDivGroupedDetails.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0];
+        const cellName = pointData.label;
+        const foldChange = pointData.value;
+
+        const hoverContent = `
+            <b>Cell Name:</b> ${cellName}<br>
+            <b>Fold Change:</b> ${foldChange}
+        `;
+        document.getElementById("hover-content-grouped-details").innerHTML = hoverContent;
     });
 }
 
@@ -1044,4 +1100,3 @@ function updateSearchDescription() {
             inputField.placeholder = "Enter search query...";
     }
 }
-

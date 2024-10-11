@@ -94,6 +94,13 @@ lastVisitedPageCache('gene-details', [
                                     <?php if (!empty($geneDetailsSchema['desc'])): ?>
                                         <p class="card-text"><strong>Description:</strong> <?= htmlspecialchars($geneDetailsSchema['desc']) ?></p>
                                     <?php endif; ?>
+                                    <?php if (!empty($geneDetailsSchema['geneID'])): ?>
+                                        <a title="Download full JSON Schema" href="<?php echo $_ENV['WEB_URL'] . '/download/' . $geneDetailsSchema['geneID']; ?>" target="_blank" 
+                                            class="position-absolute" style="bottom: 16px; right: 16px;">
+                                            <i class="fas fa-download" style="font-size: 1.5rem;"></i> <!-- Download icon -->
+                                        </a>
+                                    <?php endif; ?>
+
                                 </div>
                             </div>
                             <?php endif; ?>
@@ -181,6 +188,7 @@ lastVisitedPageCache('gene-details', [
                         if (isset($geneDetailsSchema['singleCellExpressions']['effectSizes']) && !empty($geneDetailsSchema['singleCellExpressions']['effectSizes'])):
                     ?>
                     <h2>Cells (max top 100)</h2>
+                    <p><small>(Marker Score score is uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
                     <div class="card mb-3" style="max-height: 250px; overflow-y: scroll;">
                         <div class="card-body">
                             <?php
@@ -239,16 +247,56 @@ lastVisitedPageCache('gene-details', [
                 <!-- TAB 1: TREEMAP SINGLE -->
                 <div class="tab-pane fade" id="gene-treemap-single-content" role="tabpanel" aria-labelledby="gene-treemap-single-tab">
                     <div id="gene-treemap-single" style="width: 100%;"></div>
+                    <!-- Hover Info Section for Single Treemap -->
+                    <div id="hover-info-single" class="card shadow-sm mt-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <button id="copy-button-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('single')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <p id="hover-content-single" class="card-text">Hover over a box to see details here...</p>
+                        </div>
+                    </div>
+
                 </div>
+                
                 <!-- TAB 2: TREEMAP GROUPED -->
                 <div class="tab-pane fade" id="gene-treemap-grouped-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-tab">
                     <div id="gene-treemap-grouped" style="width: 100%;"></div>
+                    <!-- Hover Info Section for Grouped Treemap -->
+                    <div id="hover-info-grouped" class="card shadow-sm mt-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <button id="copy-button-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <p id="hover-content-grouped" class="card-text">Hover over a box to see details here...</p>
+                        </div>
+                    </div>
                 </div>
+
                 <!-- TAB 3: TREEMAP GROUPED DETAILS -->
                 <div class="tab-pane fade show active" id="gene-treemap-grouped-details-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-details-tab">
                     <div id="gene-treemap-grouped-details" style="width: 100%;"></div>
+                    <!-- Hover Info Section for Grouped Details Treemap -->
+                    <div id="hover-info-grouped-details" class="card shadow-sm mt-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <button id="copy-button-grouped-details" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped-details')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <p id="hover-content-grouped-details" class="card-text">Hover over a box to see details here...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <?php endif; ?>
 
 
@@ -293,6 +341,9 @@ lastVisitedPageCache('gene-details', [
                                                     <?php echo $llm_output_formatted; ?>
                                                 </md-block>
                                             </div>
+                                        </div>
+                                        <div class="alert alert-warning mt-2" role="alert">
+                                            <strong>Disclaimer:</strong> This summary is generated by an AI language model and may contain inaccuracies or hallucinations. However, it is cross-referenced with curated gene expression data from major biological sources. Please verify the information before use.
                                         </div>
                                         <?php endif; ?>
                                     </div>
@@ -469,9 +520,10 @@ lastVisitedPageCache('gene-details', [
             <div class="container-lg">
                 <div class="text-left">
                     <h2>Database document:</h2>
-                        <p id="searchDescription" class="mt-2" style="text-align: left;">
-                            Only the first few entries are kept for 'singleCellExpressions,' 'mRNAExpressions,' and other large data arrays for visualization purposes.
-                        </p>
+                    <p id="searchDescription" class="mt-2" style="text-align: left;">
+                        This is <strong>a preview</strong> of the gene's schema. Only a few entries are kept for 'singleCellExpressions,' 'mRNAExpressions,' and other large data arrays for visualization purposes. 
+                        For the full schema, <a href="<?php echo $_ENV['WEB_URL'] . '/download/' . $geneID; ?>" target="_blank">download it here</a>.
+                    </p>
                 </div>
             </div>
 
