@@ -251,7 +251,7 @@ lastVisitedPageCache('gene-details', [
                     <div id="hover-info-single" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <h5 class="card-title"></h5>
                                 <button id="copy-button-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('single')">
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
@@ -269,7 +269,7 @@ lastVisitedPageCache('gene-details', [
                     <div id="hover-info-grouped" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <h5 class="card-title"></h5>
                                 <button id="copy-button-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped')">
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
@@ -286,7 +286,7 @@ lastVisitedPageCache('gene-details', [
                     <div id="hover-info-grouped-details" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                <h5 class="card-title"></h5>
                                 <button id="copy-button-grouped-details" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped-details')">
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
