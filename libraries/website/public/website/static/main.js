@@ -590,6 +590,13 @@ function plotCellTreemapGrouped() {
     Plotly.newPlot("cell-treemap-grouped", [trace], layout, config).then(() => {
         hideLoadingBar();
     });
+    
+    const cellTreemapGroupedDiv = document.getElementById("cell-treemap-grouped");
+    cellTreemapGroupedDiv.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0]; // Get the first hovered point
+        const hoverContent = `${pointData.text}`;
+        document.getElementById("hover-content-cell-grouped").innerHTML = hoverContent;
+    });
 }
 
 function plotCellTreemapSingle() {
@@ -647,6 +654,13 @@ function plotCellTreemapSingle() {
 
     Plotly.newPlot("cell-treemap-single", [trace], layout, config).then(() => {
         hideLoadingBar();
+    });
+
+    const cellTreemapDiv = document.getElementById("cell-treemap-single");
+    cellTreemapDiv.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0]; // Get the first hovered point
+        const hoverContent = `${pointData.text}`;
+        document.getElementById("hover-content-cell-single").innerHTML = hoverContent;
     });
 }
 
