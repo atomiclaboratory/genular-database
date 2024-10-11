@@ -95,7 +95,7 @@ lastVisitedPageCache('gene-details', [
                                         <p class="card-text"><strong>Description:</strong> <?= htmlspecialchars($geneDetailsSchema['desc']) ?></p>
                                     <?php endif; ?>
                                     <?php if (!empty($geneDetailsSchema['geneID'])): ?>
-                                        <a title="Download full JSON Schema" href="<?php echo $_ENV['WEB_URL'] . '/download/' . $geneDetailsSchema['geneID']; ?>" target="_blank" 
+                                        <a title="Download full JSON Object" href="<?php echo $_ENV['WEB_URL'] . '/download/' . $geneDetailsSchema['geneID']; ?>" target="_blank" 
                                             class="position-absolute" style="bottom: 16px; right: 16px;">
                                             <i class="fas fa-download" style="font-size: 1.5rem;"></i> <!-- Download icon -->
                                         </a>
