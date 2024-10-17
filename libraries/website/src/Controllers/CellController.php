@@ -433,6 +433,9 @@ class CellController
      */
     public function suggestCells(Request $request, Response $response, array $args)
     {
+
+        $this->userDetails = $request->getAttribute('userDetails');
+
         $rawBody = (string) $request->getBody();
         $body = json_decode($rawBody, true);
 
@@ -446,7 +449,7 @@ class CellController
 
         // Validate 'page' and 'limit' values
         $page = max($page, 1);
-        $limit = max($limit, 1);
+        $limit = min($limit, $this->userDetails["page_limit"]);
 
         // Generate a unique cache key based on request parameters, including 'page' and 'limit'
         $cacheKey = $this->apiHelper->getCacheKey($body);
@@ -465,12 +468,14 @@ class CellController
         //     return $response->withJson($cachedData);
         // }
 
-        // Find all matching cells by score and sort them
+        // Find all matching cells by score and sort them 637
         $cellMatches = $this->scoreAndSortCellMatches($queryValues);
+
 
         // Add MarkerScores for each if we have it in our database!
         $cellMatches = $this->addMarkerScores($cellMatches);
 
+    
         // Pagination logic before sorting by lineages
         $totalCount = count($cellMatches);
         $totalPages = (int) ceil($totalCount / $limit);
@@ -569,41 +574,68 @@ class CellController
      * @param array $cellMatches Array of cell matches to sort.
      * @return array Sorted array of cell matches with lineage-based hierarchy.
      */
-    public function sortByLineages($cellMatches) {
+    public function sortByLineages($cellMatches, $maxDepth = 3) {
         $lineagesDoc = $this->collection_genes_helpers->findOne(['type' => 'cellLineages']);
-
         $sortedCellMatches = [];
 
         if ($lineagesDoc && isset($lineagesDoc['cells'])) {
             $cellLineages = $lineagesDoc['cells'];
-            // Convert cellMatches to an associative array for easier lookup
+
+            // Convert cellMatches to an associative array for easy lookup
             $cellMatchesAssoc = [];
             foreach ($cellMatches as $match) {
                 $cellMatchesAssoc[$match['cell_id']] = $match;
             }
-            // Iterate through each lineage
-            foreach ($cellLineages as $parent => $children) {
-                if (isset($cellMatchesAssoc[$parent])) {
-                    $parentMatch = $cellMatchesAssoc[$parent];
-                    $parentMatch['childs'] = [];
-                    // Check for each child
-                    foreach ($children as $childKey) {
-                        if (isset($cellMatchesAssoc[$childKey])) {
-                            $parentMatch['childs'][] = $cellMatchesAssoc[$childKey];
-                            unset($cellMatchesAssoc[$childKey]);  // Remove the child from the top level
+
+            // Recursive function to process children with depth limit
+            function processChildren($parent, &$cellLineages, &$cellMatchesAssoc, $depth, $maxDepth) {
+                // Stop recursion if the depth limit is reached or parent not found
+                if ($depth >= $maxDepth || !isset($cellMatchesAssoc[$parent])) {
+                    return null; // Skip if parent not found in matches
+                }
+
+                // Pull the full parent match or skip if not found
+                $parentMatch = $cellMatchesAssoc[$parent];
+
+                // Initialize the 'childs' field if children exist
+                $parentMatch['childs'] = [];
+
+                // If the parent has children in the lineage, recursively process each child
+                if (isset($cellLineages[$parent])) {
+                    foreach ($cellLineages[$parent] as $childKey) {
+                        // Recursively process the child
+                        $childMatch = processChildren($childKey, $cellLineages, $cellMatchesAssoc, $depth + 1, $maxDepth);
+                        if ($childMatch) {
+                            $parentMatch['childs'][] = $childMatch;
                         }
                     }
-                    $sortedCellMatches[] = $parentMatch;
-                    unset($cellMatchesAssoc[$parent]);  // Remove the parent from the associative array
+                }
+
+                return $parentMatch;
+            }
+
+            // Iterate through each lineage and process the children recursively
+            foreach ($cellLineages as $parent => $children) {
+                if (isset($cellMatchesAssoc[$parent])) {
+                    $parentMatch = processChildren($parent, $cellLineages, $cellMatchesAssoc, 0, $maxDepth);
+                    if ($parentMatch) {
+                        $sortedCellMatches[] = $parentMatch;
+                    }
+                    unset($cellMatchesAssoc[$parent]);  // Remove processed parent from associative array
                 }
             }
-            // Append remaining cellMatches that were not in lineages
+
+            // Append remaining unmatched cellMatches that were not included in lineages
             foreach ($cellMatchesAssoc as $remainingMatch) {
                 $sortedCellMatches[] = $remainingMatch;
             }
         }
+
         return $sortedCellMatches;
     }
+
+
+
 
     /**
      * Scores and sorts cell matches based on query values.
@@ -614,66 +646,67 @@ class CellController
      * @param array $queryValues Query values to score the cell matches against.
      * @return array Array of scored and sorted cell matches.
      */
-private function scoreAndSortCellMatches($queryValues) {
-    $linkedEntitiesDoc = $this->collection_genes_helpers->find(['type' => 'linkedEntities'], [
-        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
-    ]);
+    private function scoreAndSortCellMatches($queryValues) {
+        // Fetch 'linkedEntities' documents
+        $linkedEntitiesDoc = $this->collection_genes_helpers->find(['type' => 'linkedEntities'], [
+            'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
+        ]);
 
-    $results = [];
-    foreach ($linkedEntitiesDoc as $document) {
-        if (isset($document['cells']) && is_array($document['cells'])) {
-            foreach ($document['cells'] as $key => $cell) {
-                $keyProcessed = preg_replace('/\W+/', ' ', strtolower($key)); // Normalize key
-                $cellString = is_array($cell) || is_object($cell) ? strtolower(json_encode($cell)) : strtolower((string)$cell); // Normalize cell content
+        $results = [];
+        foreach ($linkedEntitiesDoc as $document) {
+            if (isset($document['cells']) && is_array($document['cells'])) {
+                foreach ($document['cells'] as $key => $cell) {
+                    // Normalize key and content
+                    $keyProcessed = preg_replace('/\W+/', ' ', strtolower($key)); 
+                    $cellString = is_array($cell) || is_object($cell) ? strtolower(json_encode($cell)) : strtolower((string)$cell);
+                    $cellName = strtolower($cell['name'] ?? '');
 
-                // If $queryValues is empty, add all cells to results without scoring
-                if (empty($queryValues)) {
-                    $results[] = [
-                        "cell_id" => $key,
-                        "cell_name" => $cell['name'] ?? '', // Use the cell name or empty string
-                        "search_score" => 0 // Default score
-                    ];
-                } else {
-                    foreach ($queryValues as $queryValue) {
-                        $queryValueProcessed = preg_replace('/\W+/', ' ', strtolower(trim($queryValue)));
+                    // If queryValues is empty, add all cells with default score
+                    if (empty($queryValues)) {
+                        $results[] = [
+                            "cell_id" => $key,
+                            "cell_name" => $cell['name'] ?? '', 
+                            "search_score" => 0 
+                        ];
+                    } else {
+                        foreach ($queryValues as $queryValue) {
+                            $queryValueProcessed = preg_replace('/\W+/', ' ', strtolower(trim($queryValue)));
+                            $score = 0;
 
-                        // Initialize score
-                        $score = 0;
+                            // Prioritize exact match for the query in the cell name
+                            if (strcasecmp($cellName, $queryValueProcessed) === 0) {
+                                $score += 100;  // Highest score for exact match
+                            } elseif (strpos($cellName, $queryValueProcessed) !== false) {
+                                $score += 50;  // High score for partial match in the cell name
+                            }
 
-                        // Full-text search-like matching: check if query appears anywhere in key or cell string
-                        if (strpos($keyProcessed, $queryValueProcessed) !== false) {
-                            $score += 30; // Score for match in key
-                        }
-                        if (strpos($cellString, $queryValueProcessed) !== false) {
-                            $score += 30; // Score for match in cell content
-                        }
+                            // Full-text search matching in the key and content
+                            if (strpos($keyProcessed, $queryValueProcessed) !== false) {
+                                $score += 20;  // Lower score for match in key
+                            }
+                            if (strpos($cellString, $queryValueProcessed) !== false) {
+                                $score += 20;  // Lower score for match in content
+                            }
 
-                        // Add the result only if there's a positive score
-                        if ($score > 0) {
-                            $results[] = [
-                                "cell_id" => $key,
-                                "cell_name" => $cell['name'],
-                                "search_score" => $score
-                            ];
+                            // Only add if score > 0
+                            if ($score > 0) {
+                                $results[] = [
+                                    "cell_id" => $key,
+                                    "cell_name" => $cell['name'],
+                                    "search_score" => $score
+                                ];
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    // Sorting logic
-    if (empty($queryValues)) {
-        usort($results, function ($a, $b) {
-            return strnatcmp($a['cell_id'], $b['cell_id']);
-        });
-    } else {
+        // Ensure sorting by search_score in descending order
         usort($results, function ($a, $b) {
             return $b['search_score'] - $a['search_score'];
         });
+
+        return $results;
     }
-
-    return $results;
-}
-
 }

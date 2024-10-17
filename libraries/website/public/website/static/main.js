@@ -7,6 +7,10 @@ function hideLoadingBar() {
     document.getElementById("loading-bar").style.display = "none";
 }
 
+$(window).bind("pageshow", function (event) {
+    hideLoadingBar();
+});
+
 $(document).ready(function () {
     updateSearchDescription();
 
@@ -70,10 +74,11 @@ $(document).ready(function () {
         $result.data("itemId", item.id);
         $result.data("score", item.score); // Store the score for later retrieval
 
+        // Render parent items without padding, child items with padding for indentation
         if (item.isChild) {
-            $result.append(document.createTextNode(item.text)).css("padding-left", "20px");
+            $result.html(item.text).css("padding-left", "20px");
         } else {
-            $result.append(document.createTextNode(item.text));
+            $result.html(item.text); // Add HTML directly, Select2 will render it properly
         }
 
         return $result;
@@ -96,7 +101,7 @@ $(document).ready(function () {
             allowClear: true,
             minimumInputLength: 1,
             maximumSelectionLength: 10,
-            templateResult: formatDropdown,
+            templateResult: formatDropdown, // Use HTML in the dropdown
             templateSelection: formatDropdownSelection,
             closeOnSelect: false, // Keep the dropdown open after a selection is made
             ajax: {
@@ -138,6 +143,7 @@ $(document).ready(function () {
                 },
                 processResults: function (data) {
                     var results = [];
+
                     if ($("#searchType").val() === "symbol") {
                         data.results.forEach(function (item) {
                             results.push({
@@ -150,7 +156,8 @@ $(document).ready(function () {
                         data.results.forEach(function (item) {
                             results.push({
                                 id: item.cell_id,
-                                text: item.cell_name,
+                                text: item.cell_name + " - <small>(" + item.cell_id + ")</small>",
+                                search_score: item.search_score,
                                 score: item.marker_score,
                             });
 
@@ -158,13 +165,19 @@ $(document).ready(function () {
                                 item.childs.forEach(function (child) {
                                     results.push({
                                         id: child.cell_id,
-                                        text: child.cell_name,
+                                        text: child.cell_name + " - <small>(" + child.cell_id + ")</small>",
+                                        search_score: child.search_score,
                                         score: child.marker_score,
                                         isChild: true,
                                         parentId: item.cell_id,
                                     });
                                 });
                             }
+                        });
+
+                        // Sort results by search_score in descending order
+                        results.sort(function (a, b) {
+                            return b.search_score - a.search_score;
                         });
                     }
                     return { results: results };
@@ -193,28 +206,8 @@ $(document).ready(function () {
 
                 setTimeout(function () {
                     window.location.href = redirectUrl;
-                }, 1000);
+                }, 1000); // Delay of 200ms
             }, 200); // Delay of 200ms
-
-            // // Check if there are no selected items
-            // if (selectedItems.length === 0) {
-            //     // Hide the specific HTML container if nothing is selected
-            //     $(".searchResultsTextarea").hide();
-            // } else {
-            //     // Format selected items into a string representation
-            //     var resultsString = selectedItems
-            //         .map(function (item) {
-            //             // Check if parentId exists; if not, set it to null
-            //             var parentId = item.parentId !== undefined ? item.parentId : null;
-            //             // Return the item as a string including parentId, defaulting to null if it's undefined
-            //             return '{"' + item.id + '": "' + item.text + '", "parentId": ' + JSON.stringify(parentId) + "}";
-            //         })
-            //         .join(", "); // Join all items with a comma and a space for readability
-            //     // Update the textarea with the formatted string and show the container
-            //     $("#searchResults").val("[" + resultsString + "]"); // Enclose in square brackets to denote an array
-            //     $(".searchResultsTextarea").show(); // Show the specific HTML container when there are selected items
-            //     adjustTextareaHeight(document.getElementById("searchResults"));
-            // }
         });
 
     $("#searchButton").click(function () {
@@ -696,7 +689,11 @@ function plotGeneTreemapSingle() {
         values: values,
         textinfo: "label+value+percent entry",
         hoverinfo: "label+value+text",
-        hovertemplate: "<b>%{label}</b><br>" + "Fold Change: %{value}<br>" + "Marker Score: %{text}<br>" + "Cell ID: <a href='https://genular.atomic-lab.org/details-cell/%{customdata}' target='_blank'>%{customdata}</a><extra></extra>", // Customize hover tooltip with link
+        hovertemplate:
+            "<b>%{label}</b><br>" +
+            "Fold Change: %{value}<br>" +
+            "Marker Score: %{text}<br>" +
+            "Cell ID: <a href='https://genular.atomic-lab.org/details-cell/%{customdata}' target='_blank'>%{customdata}</a><extra></extra>", // Customize hover tooltip with link
         marker: {
             colorscale: "Cividis",
             colors: values,
@@ -747,7 +744,7 @@ function plotGeneTreemapSingle() {
         const cellID = pointData.customdata; // Extract cell_id from customdata
 
         // Generate a URL based on cell_id
-        const cellURL =  `${WEB_URL}/details-cell/${cellID}`;
+        const cellURL = `${WEB_URL}/details-cell/${cellID}`;
 
         // Update the hover-info div with the hovered data, including cell ID and a clickable link
         const hoverContent = `
@@ -759,8 +756,6 @@ function plotGeneTreemapSingle() {
         document.getElementById("hover-content-single").innerHTML = hoverContent;
     });
 }
-
-
 
 function plotGeneTreemapGrouped() {
     showLoadingBar();

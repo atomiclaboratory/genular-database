@@ -23,33 +23,39 @@ if ($cellID !== false) {
     }
 }
 
+
+
+
 include __DIR__ . '/include/head.php';
 
 if(!is_null($cellDetails)){
-// Modify the cell ID for the API (insert underscore after CL)
-        $apiCellID = substr($cellID, 0, 2) . '_' . substr($cellID, 2);
-        // Fetch additional data from the JSON API if cell ID is valid
-        $apiUrl = "https://www.ebi.ac.uk/ols4/api/ontologies/cl/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252F" . urlencode($apiCellID);
-        $context = stream_context_create(['http' => ['timeout' => 4]]);
-        $apiResponse = @file_get_contents($apiUrl, false, $context);
+    // Modify the cell ID for the API (insert underscore after CL)
+    $apiCellID = substr($cellID, 0, 2) . '_' . substr($cellID, 2);
+    // Fetch additional data from the JSON API if cell ID is valid
+    $apiUrl = "https://www.ebi.ac.uk/ols4/api/ontologies/cl/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252F" . urlencode($apiCellID);
+    $context = stream_context_create(['http' => ['timeout' => 4]]);
+    $apiResponse = @file_get_contents($apiUrl, false, $context);
 
-        if ($apiResponse !== false) {
-            $apiData = json_decode($apiResponse, true);
-            $description = $apiData['description'][0] ?? 'No description available';
-            $synonyms = $apiData['synonyms'] ?? ['No synonyms available'];
-            $depiction = $apiData['annotation']['depiction'][0] ?? null;
-        }
+    if ($apiResponse !== false) {
+        $apiData = json_decode($apiResponse, true);
+        $description = $apiData['description'][0] ?? 'No description available';
+        $synonyms = $apiData['synonyms'] ?? ['No synonyms available'];
+        $depiction = $apiData['annotation']['depiction'][0] ?? null;
+    }
+
+    $genesForCell = searchGenesForCell($queryValues = [$cellDetails['cell_id'] => ">= ".$cellDetails['marker_score']], 500);
+
+    if ($genesForCell && isset($genesForCell['results'][0])){
+        $genesForCellCount = $genesForCell ? $genesForCell['total'] : 0;
+        $genesForCell = $genesForCell['results'];
+    }else{
+        $genesForCell = null;
+    }
 }
 
 
-$genesForCell = searchGenesForCell($queryValues = [$cellDetails['cell_id'] => ">= ".$cellDetails['marker_score']], 500);
 
-if ($genesForCell && isset($genesForCell['results'][0])){
-    $genesForCellCount = $genesForCell ? $genesForCell['total'] : 0;
-    $genesForCell = $genesForCell['results'];
-}else{
-    $genesForCell = null;
-}
+
 
 // Transform the results to sum foldChange from effectSizes and move to the main level
 if (!is_null($genesForCell)) {
@@ -240,73 +246,75 @@ lastVisitedPageCache('cell-details', [
             </div>
 
 
-            <div class="d-flex align-items-center justify-content-between">
-                <ul class="nav nav-tabs" id="cellTreeMapTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link" id="cell-treemap-single-tab" data-toggle="tab" 
-                        href="#cell-treemap-single-content" role="tab" aria-controls="cell-treemap-single-content" 
-                        title="Gene representation (across all tissues)"
-                        aria-selected="false">Gene representation (<?php echo $genesForCellCount ; ?>)</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" id="cell-treemap-grouped-tab" data-toggle="tab" 
-                        href="#cell-treemap-grouped-content" role="tab" aria-controls="cell-treemap-grouped-content" 
-                        title="Gene/Pathway representation (across all tissues)"
-                        aria-selected="true">Gene/Pathway representation (<?php echo $genesForCellCount ; ?>)</a>
-                    </li>
-                </ul>
-                <button id="downloadCellData" class="btn btn-link ml-auto">
-                    <i class="fa fa-download"></i> Download CSV
-                </button>
-            </div>
+            <?php if (!is_null($cellDetails)): ?>
+                <div class="d-flex align-items-center justify-content-between">
+                    <ul class="nav nav-tabs" id="cellTreeMapTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" id="cell-treemap-single-tab" data-toggle="tab" 
+                            href="#cell-treemap-single-content" role="tab" aria-controls="cell-treemap-single-content" 
+                            title="Gene representation (across all tissues)"
+                            aria-selected="false">Gene representation (<?php echo $genesForCellCount ; ?>)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="cell-treemap-grouped-tab" data-toggle="tab" 
+                            href="#cell-treemap-grouped-content" role="tab" aria-controls="cell-treemap-grouped-content" 
+                            title="Gene/Pathway representation (across all tissues)"
+                            aria-selected="true">Gene/Pathway representation (<?php echo $genesForCellCount ; ?>)</a>
+                        </li>
+                    </ul>
+                    <button id="downloadCellData" class="btn btn-link ml-auto">
+                        <i class="fa fa-download"></i> Download CSV
+                    </button>
+                </div>
 
-            <!-- Tab Content -->
-            <div class="tab-content" id="cellTreeMapTabContent">
-                <!-- TAB 1: TREEMAP single -->
-                <div class="tab-pane fade" id="cell-treemap-single-content" role="tabpanel" aria-labelledby="cell-treemap-single-tab">
-                    <div id="cell-treemap-single" style="width: 100%;"></div>
-                    <div id="hover-info-cell-single" class="card shadow-sm mt-4">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
-                                <button id="copy-button-cell-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-single')">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
+                <!-- Tab Content -->
+                <div class="tab-content" id="cellTreeMapTabContent">
+                    <!-- TAB 1: TREEMAP single -->
+                    <div class="tab-pane fade" id="cell-treemap-single-content" role="tabpanel" aria-labelledby="cell-treemap-single-tab">
+                        <div id="cell-treemap-single" style="width: 100%;"></div>
+                        <div id="hover-info-cell-single" class="card shadow-sm mt-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                    <button id="copy-button-cell-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-single')">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <p id="hover-content-cell-single" class="card-text">Hover over a box to see details here...</p>
                             </div>
-                            <p id="hover-content-cell-single" class="card-text">Hover over a box to see details here...</p>
+                        </div>
+                    </div>
+                    <!-- TAB 2: TREEMAP grouped -->
+                    <div class="tab-pane fade show active" id="cell-treemap-grouped-content" role="tabpanel" aria-labelledby="cell-treemap-grouped-tab">
+                        <div id="cell-treemap-grouped" style="width: 100%;"></div>
+                        <div id="hover-info-cell-grouped" class="card shadow-sm mt-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                    <button id="copy-button-cell-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-grouped')">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <p id="hover-content-cell-grouped" class="card-text">Hover over a box to see details here...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- TAB 2: TREEMAP grouped -->
-                <div class="tab-pane fade show active" id="cell-treemap-grouped-content" role="tabpanel" aria-labelledby="cell-treemap-grouped-tab">
-                    <div id="cell-treemap-grouped" style="width: 100%;"></div>
-                    <div id="hover-info-cell-grouped" class="card shadow-sm mt-4">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <h5 class="card-title"><strong>Hovered Details</strong></h5>
-                                <button id="copy-button-cell-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-grouped')">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
-                            </div>
-                            <p id="hover-content-cell-grouped" class="card-text">Hover over a box to see details here...</p>
-                        </div>
+
+
+
+                <?php if (!is_null($llm_output_formatted) && str_word_count($llm_output_formatted) > 25): ?>
+                <div class="row">
+                    <div class="col-md-12 watermarked-text">
+                        <md-block>
+                            <?php echo $llm_output_formatted; ?>
+                        </md-block>
                     </div>
                 </div>
-            </div>
-
-
-
-            <?php if (!is_null($llm_output_formatted) && str_word_count($llm_output_formatted) > 25): ?>
-            <div class="row">
-                <div class="col-md-12 watermarked-text">
-                    <md-block>
-                        <?php echo $llm_output_formatted; ?>
-                    </md-block>
+                <div class="alert alert-warning mt-2" role="alert">
+                    <strong>Disclaimer:</strong> This summary is generated by an AI language model and may contain inaccuracies or hallucinations. However, it is cross-referenced with curated gene expression data from major biological sources. Please verify the information before use.
                 </div>
-            </div>
-            <div class="alert alert-warning mt-2" role="alert">
-                <strong>Disclaimer:</strong> This summary is generated by an AI language model and may contain inaccuracies or hallucinations. However, it is cross-referenced with curated gene expression data from major biological sources. Please verify the information before use.
-            </div>
+                <?php endif; ?>
             <?php endif; ?>
             <?php if ($cellUnknown === true): ?>
                 <div class="alert alert-warning" role="alert">
