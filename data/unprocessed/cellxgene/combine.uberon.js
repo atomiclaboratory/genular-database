@@ -582,7 +582,8 @@ for (let i = 0; i < allGeneKeys.length; i++) {
             console.log("===> INFO: Calc END marker scores for " + gene_id + " in " + final_calc_time+ " sec\n");
         }
 
-        // Now when we collected all the effectSizes for all selectedCell, we can calculate the markerScore and save results to cellThresholds and effectSizes
+        // Now when we collected all the effectSizes for all selectedCell, 
+        // we can calculate the markerScore and save results to cellThresholds and effectSizes
         let second_calc_start = new Date().getTime();
         expressions.forEach((selectedCell, index) => {
             if (!cellThresholds[selectedCell.cell_id]) {
@@ -592,11 +593,8 @@ for (let i = 0; i < allGeneKeys.length; i++) {
             Object.keys(cellEffectSizes[selectedCell.cell_id]).forEach(context => {
                 const scores = cellEffectSizes[selectedCell.cell_id][context];
                 if (scores.length > 0) {
+                    // 10th percentile of boostrap resamples / more rigid
                     let markerScore = bootstrapPercentile(scores, numBootstrapSamples, 0.1);
-
-                    // let markerScore = getPercentile(scores, 0.1);
-                    // let markerScore = median(scores);
-
                     if (Number.isFinite(markerScore)) {
                         if (!cellThresholds[selectedCell.cell_id][context]) {
                             cellThresholds[selectedCell.cell_id][context] = [];

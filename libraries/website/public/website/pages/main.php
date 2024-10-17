@@ -116,7 +116,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title"><i class="fa fa-dna"></i> Genes</h5>
-                                        <p class="card-text">42.1M</p>
+                                        <p class="card-text">52M</p>
                                     </div>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title"><i class="fa fa-dna"></i> Proteins</h5>
-                                        <p class="card-text">9.4M</p>
+                                        <p class="card-text">9.4M<!-- 9414300 --></p>
                                     </div>
                                 </div>
                             </div>

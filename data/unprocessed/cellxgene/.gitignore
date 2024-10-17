@@ -10,3 +10,4 @@ output/*.json
 output/genes/*
 data.cells.json
 data.processed.json
+cell_expression_counts.csv
