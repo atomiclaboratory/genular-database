@@ -7,6 +7,7 @@ allGenes.processed.first.json
 bulk
 
 output/*.json
+output/*.csv
 output/genes/*
 data.cells.json
 data.processed.json
