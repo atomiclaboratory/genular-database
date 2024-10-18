@@ -28,26 +28,25 @@ This repository contains scripts to download, process, and integrate single-cell
 
 ### 1. Data Acquisition
 - **Objective:** Download single-cell dataset IDs from the cellxgene website.
-- **Execution:** Run `index.js` to check for and download missing datasets into the `./bulk` directory.
+- **Execution:** Install node dependencies and run `node index.js` to check for and download missing datasets into the `./bulk` directory.
 
 ### 2. Data Processing
 - **Objective:** Convert H5AD files to JSON format and standardize naming.
-- **Execution:** Activate your conda environment `conda activate cellxgene` and execute `process_data/main.py`. This step transforms H5AD files into JSON and appends UBERON IDs to filenames where absent.
+- **Execution:** Import/create and activate your conda environment `conda activate cellxgene` and execute `process_data/main.py`. This step transforms H5AD files into JSON and appends UBERON IDs to filenames where absent.
 
-### 3. Data Post processing
-- **Objective:** Process all converted data, calculate effect sizes and generate mapping files
+### 3. Data-Integration
+- **Objective:** Process all converted data, calculate effect sizes and generate gene files
+- **Execution:**
+  - Run `node --max-old-space-size=1300000 combine.uberon.js` to initiate.
+
+### 4. Data Post processing
+- **Objective:** Process all generated gene files, calculate thresholds and generate main database import file (`output/data.processed.json`)
 - **Execution:**
   - Run `node --max-old-space-size=1300000 processing.js` to initiate.
 
-### 4. Data-Integration
-- **Objective:** Integrate the processed data into the application
-- **Execution:** 
-  - Transfer `data.processed.json` into the application's data directory (`data/cellxgene/bulk/data.processed.json`).
-  - Import `data.cells.json`, `data.cellLinkedEntities.json`, `data.cellLineages.json` into genes_helpers mongodb collection as separate objects.
-
 ### 5. Ontology Mapping Generation
 - **Objective:** Create a mapping file to support end-user cell type searches.
-- **Execution:** Primary script will compile 3 additional json files, import them into genes_helpers->genes_helpers.
+- **Execution:** Primary script will compile 3 additional json files, import them into mongodb (genes_helpers->genes_helpers).
 ```
 $this->markerScoresDoc = $this->collection_genes_helpers->findOne(['type' => 'markerScores']);
 {
@@ -75,13 +74,13 @@ $this->linkedEntitiesDoc = $this->collection_genes_helpers->findOne(['type' => '
 }
 ```
 
-### Reference Steps
+### Other (Reference Steps)
 - Crawl through the JSON data to extract unique cell IDs.
 - Generate a database import file leveraging these IDs and referencing the following schema:
   - Schema: `id, cl_id, parent_cl_id, cl_name, cl_synonyms, cl_definition`
   - Data source: [EBI Cell Ontology](https://ftp.ebi.ac.uk/pub/databases/spot/ols/latest/ontologies.json.gz)
 
-## Cell Ontology Reference
+## Other (Cell Ontology Reference)
 
 For additional context on how UBERON and Cell Ontology (CL) IDs are integrated into the data structure, please refer to the EBI Cell Ontology resource:
 
