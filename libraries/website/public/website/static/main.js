@@ -9,6 +9,8 @@ function hideLoadingBar() {
 
 $(window).bind("pageshow", function (event) {
     hideLoadingBar();
+    // clear select2 dropdowns
+    $(".select2-ajax").val(null).trigger("change");
 });
 
 $(document).ready(function () {

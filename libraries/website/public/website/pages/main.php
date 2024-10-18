@@ -133,8 +133,8 @@
                             <div class="col-md-4 mb-2 mb-md-0">
                                 <div class="card text-center">
                                     <div class="card-body">
-                                        <h5 class="card-title"><i class="fa fa-dna"></i> Cells</h5>
-                                        <p class="card-text">340M</p>
+                                        <h5 class="card-title"><i class="fa fa-dna"></i> Unique Cells</h5>
+                                        <p class="card-text">74.5M</p>
                                     </div>
                                 </div>
                             </div>
