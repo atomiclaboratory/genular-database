@@ -762,10 +762,11 @@ function plotGeneTreemapSingle() {
 function plotGeneTreemapGrouped() {
     showLoadingBar();
     if (!Array.isArray(labels) || labels.length === 0 || !Array.isArray(parents) || parents.length === 0) {
+        console.error("Mismatch between labels and labels length.");
         return;
     }
 
-    // Step 1: Aggregate the effectSizesData by parent to calculate the sum of foldChange for each group
+    // Step 1: Aggregate the effectSizesData by parent
     const groupFoldChangeMap = {};
     effectSizesData.forEach((d) => {
         const parent = d.parent || "All Cells";
@@ -777,39 +778,84 @@ function plotGeneTreemapGrouped() {
         groupFoldChangeMap[parent] += foldChange;
     });
 
-    // Step 2: Create an array to store values that correspond to labels, taking both groups and individual cells into account
-    const values = labels.map((label) => {
-        if (label === "All Cells") {
-            return 0; // The root node should have a value of 0
-        } else if (groupFoldChangeMap[label] !== undefined) {
-            return groupFoldChangeMap[label]; // Use the sum of foldChange for the group
+    // Step 2: Create a label mapping and make labels unique
+    const labelMapping = {};
+    const uniqueLabels = labels.map((label, index) => {
+        const parent = parents[index];
+        const labelOccurrences = labels.filter((l) => l === label).length;
+
+        // Make labels unique if duplicates exist
+        if (labelOccurrences > 1) {
+            const uniqueLabel = `${label} (${parent})`;
+            labelMapping[label + '_' + parent] = uniqueLabel;
+            return uniqueLabel;
         } else {
-            // For individual cells, return the foldChange value from effectSizesData
-            const cellData = effectSizesData.find((d) => d.label === label);
-            return cellData ? parseFloat(cellData.foldChange) : 0;
+            labelMapping[label] = label;
+            return label;
         }
     });
 
-    // Step 3: Create hover text for each node, including both groups and individual cells
-    const hoverTexts = labels.map((label) => {
+    // Update parents array using the label mapping
+    const updatedParents = parents.map((parentLabel, index) => {
+        if (parentLabel === "") {
+            return "";
+        }
+        const parentIndex = labels.indexOf(parentLabel);
+        const grandParent = parents[parentIndex];
+        const key = parentLabel + '_' + grandParent;
+
+        return labelMapping[key] || labelMapping[parentLabel] || parentLabel;
+    });
+
+    // Step 3: Create values array
+    const values = uniqueLabels.map((label) => {
+        if (label === "All Cells") {
+            return 0; // Root node
+        } else if (groupFoldChangeMap[label] !== undefined) {
+            return groupFoldChangeMap[label]; // Group sum
+        } else {
+            // Reverse mapping to original label
+            const originalLabelKey = Object.keys(labelMapping).find(key => labelMapping[key] === label);
+            const originalLabel = originalLabelKey ? originalLabelKey.split('_')[0] : label;
+            const cellData = effectSizesData.find((d) => d.label === originalLabel);
+            return cellData && !isNaN(parseFloat(cellData.foldChange)) ? parseFloat(cellData.foldChange) : 0;
+        }
+    });
+
+    // Step 4: Create hover texts
+    const hoverTexts = uniqueLabels.map((label) => {
         if (label === "All Cells") {
             return label; // Root node hover text
         }
         if (groupFoldChangeMap[label] !== undefined) {
             return `Group: ${label}<br>Sum of Fold Change: ${groupFoldChangeMap[label].toFixed(2)}`;
         }
-        const cellData = effectSizesData.find((d) => d.label === label);
+        // Reverse mapping to original label
+        const originalLabelKey = Object.keys(labelMapping).find(key => labelMapping[key] === label);
+        const originalLabel = originalLabelKey ? originalLabelKey.split('_')[0] : label;
+        const cellData = effectSizesData.find((d) => d.label === originalLabel);
         if (cellData) {
             return `Cell: ${label}<br>Fold Change: ${cellData.foldChange.toFixed(2)}`;
         }
         return label;
     });
 
-    // Step 4: Create the treemap trace
+
+    // Step 5: Check for missing parents
+    const missingParents = updatedParents.filter(
+        (parent) => parent && !uniqueLabels.includes(parent)
+    );
+    if (missingParents.length > 0) {
+        console.error('Missing parents in labels array:', missingParents);
+    } else {
+        console.log('All parents are present in labels.');
+    }
+
+    // Step 6: Create the treemap trace
     const trace = {
         type: "treemap",
-        labels: labels,
-        parents: parents,
+        labels: uniqueLabels,
+        parents: updatedParents,
         values: values,
         textinfo: "label+value",
         textposition: "middle center",
@@ -826,7 +872,7 @@ function plotGeneTreemapGrouped() {
         text: hoverTexts,
     };
 
-    // Step 5: Create layout and configuration for the plot
+    // Step 7: Create layout and configuration for the plot
     const layout = {
         margin: { l: 0, r: 0, t: 50, b: 0 },
         hovermode: "closest",
@@ -849,7 +895,7 @@ function plotGeneTreemapGrouped() {
         scrollZoom: true,
     };
 
-    // Step 6: Render the plot
+    // Step 8: Render the plot
     Plotly.newPlot("gene-treemap-grouped", [trace], layout, config).then(() => {
         hideLoadingBar();
     });
@@ -867,6 +913,7 @@ function plotGeneTreemapGrouped() {
         document.getElementById("hover-content-grouped").innerHTML = hoverContent;
     });
 }
+
 
 function plotGeneTreemapGroupedDetails() {
     showLoadingBar();
