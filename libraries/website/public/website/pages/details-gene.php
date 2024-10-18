@@ -300,7 +300,7 @@ lastVisitedPageCache('gene-details', [
             <?php endif; ?>
 
 
-            <?php if($geneUnknown === false || $proteinData !== false): ?>
+            <?php if($geneUnknown === false || $proteinData !== false && $geneDetailsSchema !== null): ?>
                 <div class="container">
                     <h2 class="text-center mt-4 mb-4">Other Information</h2>
                     <!-- Main Tabs Navigation -->
