@@ -25,11 +25,6 @@ if ($cellID !== false) {
     }
 }
 
-
-
-
-
-
 include __DIR__ . '/include/head.php';
 
 if(!is_null($cellDetails)){
@@ -56,9 +51,6 @@ if(!is_null($cellDetails)){
         $genesForCell = null;
     }
 }
-
-
-
 
 
 // Transform the results to sum foldChange from effectSizes and move to the main level

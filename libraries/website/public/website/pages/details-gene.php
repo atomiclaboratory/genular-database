@@ -11,14 +11,21 @@ $proteinData = false;
 
 if ($geneID !== null && is_numeric($geneID) && (int)$geneID == $geneID) {
     $geneID = (int)$geneID;
-    $geneDetails = fetchGeneDetails($geneID, []);
-    $geneDetailsSchema = $geneDetails['results'][0];
 
-$pageTitle = "Gene ".
-    (!empty($geneDetailsSchema['symbol']) ? $geneDetailsSchema['symbol'] . " - " : "") . 
-    (!empty($geneDetailsSchema['crossReference']['enseGeneID']) ? $geneDetailsSchema['crossReference']['enseGeneID'] . " | " : "") . 
-    (empty($geneDetailsSchema['symbol']) && empty($geneDetailsSchema['crossReference']['enseGeneID']) ? "" : "") . 
-    "NCBI Gene ID: ". $geneID . " - Details";
+    $geneDetails = fetchGeneDetails($geneID, []);
+
+    if ($geneDetails && isset($geneDetails['results'][0])){
+        $geneDetailsSchema = $geneDetails['results'][0];
+    }else{
+        $geneDetailsSchema = null;
+        $geneUnknown = true;
+    }
+
+    $pageTitle = "Gene ".
+        (!empty($geneDetailsSchema['symbol']) ? $geneDetailsSchema['symbol'] . " - " : "") . 
+        (!empty($geneDetailsSchema['crossReference']['enseGeneID']) ? $geneDetailsSchema['crossReference']['enseGeneID'] . " | " : "") . 
+        (empty($geneDetailsSchema['symbol']) && empty($geneDetailsSchema['crossReference']['enseGeneID']) ? "" : "") . 
+        "NCBI Gene ID: ". $geneID . " - Details";
 }
 
 include __DIR__ . '/include/head.php';
