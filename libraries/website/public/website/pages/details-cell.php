@@ -19,9 +19,13 @@ if ($cellID !== false) {
         if ($cellDetails && isset($cellDetails['results'][0])){
             $cellDetails = $cellDetails['results'][0];
             $pageTitle = $cellDetails['cell_id'] . ' - ' . $cellDetails['cell_name']. " details";
+        }else{
+            $cellDetails = null;
         }
     }
 }
+
+
 
 
 
@@ -120,6 +124,8 @@ lastVisitedPageCache('cell-details', [
     'cellID' => $cellDetails['cell_id'],
     'name' => $cellDetails['cell_name']
 ]);
+
+
 
 
 ?>
