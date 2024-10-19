@@ -1,13 +1,14 @@
-genular
+Genular: An Integrated Knowledgebase Platform for Revealing
+Cell-Specific Genetic Signatures and Functional Insights
 ================
 Ivan Tomic <info@ivantomic.com>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-The goal of `genular` is to provide a comprehensive toolkit for
-interacting with the [Genular
-API](https://genular.atomic-lab.org/api-docs/), facilitating the
-retrieval and analysis of genomic data directly within R.
+The `genular` package provides a comprehensive toolkit for interacting
+with the [Genular Database API](https://genular.atomic-lab.org),
+enabling efficient retrieval, analysis, and exploration of genomic and
+single-cell expression data directly within the R environment.
 
 ## Installation
 
@@ -26,7 +27,7 @@ install.packages("devtools")
 devtools::install_github("atomiclaboratory/genular-database", subdir = 'libraries/genular-api/R-package')
 ```
 
-## Usage Example
+## Usage Examples
 
 ``` r
 # Check if plyr is installed and install it if necessary
@@ -43,8 +44,6 @@ library(genular)
 # Your personal API Key 
 # (request here or use your own installation: https://genular.atomic-lab.org/contact)
 API_KEY <- "3147dda5fa023c9763d38bddb472dd28"
-# If using own installation add custom endpoint variable in options, refer to manual
-# ENDPOINT = "https://localhost/api/v1/cells/suggest",
 ```
 
 ## Example 1: Suggesting Cell Matches Based on Query Values
@@ -55,11 +54,11 @@ API_KEY <- "3147dda5fa023c9763d38bddb472dd28"
 # Define the query values for cell type suggestions
 queryValues <- c("endothelial cell", "T cell")
 # Use the cells_suggest function to get relevant cell type matches
-cell_suggest_results <- cells_suggest(queryValues,
+search_example_1 <- cells_suggest(queryValues,
                                         options = list(api_key = API_KEY, timeout = 5000)
                                       )
 # Display the suggested cell types
-# print(head(cell_suggest_results))
+# print(head(search_example_1))
 ```
 
 ## Example 2: Searching Cell Information Based on Query Conditions
@@ -86,7 +85,7 @@ fieldsFilter <- c(
 )
 
 # Perform the cell search
-cell_search_results <- cells_search(
+search_example_2 <- cells_search(
   queryValues, 
   fieldsFilter,
   page = 1,
@@ -99,7 +98,8 @@ cell_search_results <- cells_search(
   options = list(api_key = "3147dda5fa023c9763d38bddb472dd28", timeout = 10000)
 )
 # Display the results
-# print(head(cell_search_results))
+print(head(sapply(search_example_2$content$results, function(x) x$symbol)))
+#> [1] "A2M"    "ABR"    "ACAA1"  "ACADVL" "ASIC2"  "ACP1"
 ```
 
 ## Example 3: Searching for Gene Information
@@ -115,11 +115,12 @@ fieldsFilter <- c("geneID", "symbol", "crossReference.enseGeneID")
 organismType = c(9606)
 
 # Perform the gene search
-gene_search_results <- gene_search(queryFields, queryValues, fieldsFilter, searchType = searchType,
+search_example_3 <- gene_search(queryFields, queryValues, fieldsFilter, searchType = searchType,
                                     organismType = organismType, page = 1, limit = 10,
                                     options = list(api_key = API_KEY, timeout = 1000))
 # Display the results
-# print(head(gene_search_results))
+print(head(sapply(search_example_3$content$results, function(x) x$symbol)))
+#> [1] "A1BG"  "ACRV1" "ACTC1"
 ```
 
 ## Example 4: Suggesting Pathway Matches Based on Query Values
@@ -130,31 +131,64 @@ gene_search_results <- gene_search(queryFields, queryValues, fieldsFilter, searc
 # Define the query values for pathway suggestion
 queryValues <- c("apoptosis", "signal transduction")
 # Use the pathways_suggest function to get relevant pathway matches
-pathway_suggest_results <- pathways_suggest(queryValues)
+search_example_4 <- pathways_suggest(queryValues)
 # Display the suggested pathways
-# print(head(pathway_suggest_results))
+print(head(sapply(search_example_4$results, function(x) x$term)))
+#> [1] "Apoptosis"                           "Signal Transduction"                
+#> [3] "Signal transduction by L1"           "Apoptosis induced DNA fragmentation"
+#> [5] "Signaling by NODAL"                  "Signaling by FGFR in disease"
 ```
 
-## Example 5: Gene Expression Feature Engineering
+## Example 5: Gene Expression Feature Engineering (Pathway-Level Features / PathwayGeneScore)
 
 ``` r
 # This example demonstrates how to perform feature engineering on gene expression data using external gene-related information. The goal is to convert raw gene expression data into pathway-level features for further analysis.
 
 # Define gene expression data for a set of genes across multiple samples
-input_data <- data.frame(
-    A1CF = c(2, 3, 3, 3),  # Expression levels for A1CF
-    A2M = c(3, 4, 3, 3),   # Expression levels for A2M
-    A4GALT = c(3, 4, 3, 4), # Expression levels for A4GALT
-    A4GNT = c(3, 4, 3, 3)  # Expression levels for A4GNT
-)
+# Demo data HIPC - Expression data with meta
+remote_data <- "https://genular.ams3.cdn.digitaloceanspaces.com/database-export/hipc_expression_data_with_meta.csv"
+input_data <- read.csv2(remote_data, header = TRUE, sep = ",", dec = ".", quote = "\"", fill = TRUE, comment.char = "")
 
-## deseq2 input_data to get relevantly expressed genes
+library(stats)
 
-## Fetch gene-related data from genular database
+# START DATA PREPROCESSING
+# This is just an example of how to preprocess the data before using the genular API
+# If you have raw gene expression data, probbably you will need to preprocess it before using the Genular API (eg. DESeq2)
+metadata <- input_data[, 1:36]  # Extract the first 36 columns as metadata
+input_data_counts <- input_data[, 37:ncol(input_data)]  # Extract gene expression data
+
+scaled_data <- scale(input_data_counts)
+
+# Perform PCA on the scaled data
+pca_results <- prcomp(scaled_data, center = TRUE, scale. = TRUE)
+# Get the explained variance proportions for each principal component
+explained_variance <- summary(pca_results)$importance[2,]
+# Find the number of principal components explaining 90% of the variance
+cumulative_variance <- cumsum(explained_variance)
+num_components <- which(cumulative_variance >= 0.90)[1]
+# Get the PCA loadings (rotation matrix)
+loadings <- pca_results$rotation[, 1:num_components]
+# Calculate the variance contribution of each variable by squaring the loadings
+# and multiplying by the variance explained by the respective component
+variance_contributions <- rowSums((loadings^2) * explained_variance[1:num_components])
+# Rank variables by their contribution to the variance
+ranked_variables <- sort(variance_contributions, decreasing = TRUE)
+# Determine how many variables to retain (e.g., 90% of the cumulative variance contribution)
+cumulative_var_contrib <- cumsum(ranked_variables) / sum(ranked_variables)
+# Find the number of variables that cumulatively contribute to 0.75% of the variance explained by these variables
+num_important_variables <- which(cumulative_var_contrib >= 0.75)[1]
+# Select the top contributing variables
+important_variables <- names(ranked_variables[1:num_important_variables])
+# Subset input_data_counts to include only the important variables
+input_data_filtered <- input_data_counts[, important_variables]
+
+# END DATA PREPROCESSING
+
+### Fetch gene-related data from genular database
 # Using `fetch_all_gene_search_results()`, we query gene information for the given symbols in `input_data`
-all_gene_results <- fetch_all_gene_search_results(
+search_example_5 <- fetch_all_gene_search_results(
   queryFields = list(c("symbol")),  # Specify that the query is based on gene symbols
-  queryValues = colnames(input_data),  # Gene symbols extracted from the column names of 'input_data'
+  queryValues = colnames(input_data_filtered),  # Gene symbols extracted from the column names of 'input_data'
   fieldsFilter = c("geneID", "symbol", "crossReference.enseGeneID", 
                    "mRNAExpressions.proteinAtlas.c", 
                    "ontology.id", "ontology.term", "ontology.cat"),  # Fields to be fetched
@@ -169,9 +203,13 @@ all_gene_results <- fetch_all_gene_search_results(
   options = list(api_key = API_KEY, timeout = 1000)  # API key and timeout for the request
 )
 
+all_gene_symbols <- sapply(search_example_5, function(x) x$symbol)
+gene_not_found <- setdiff(colnames(input_data_filtered), all_gene_symbols)
+input_data_filtered <- input_data_filtered[, setdiff(colnames(input_data_filtered), gene_not_found)]
+
 ## Transform and restructure the fetched gene-related data
 # The `extract_data()` function helps map various gene attributes to a more usable format
-data_transposed <- extract_data(all_gene_results, list(
+data_transposed <- extract_data(search_example_5, list(
     "geneID" = "mappedGeneID",  # Mapping gene IDs
     "symbol" = "mappedSymbol",  # Mapping gene symbols
     "crossReference$enseGeneID" = "mappedEnseGeneID",  # Mapping Ensembl gene IDs
@@ -183,23 +221,17 @@ data_transposed <- extract_data(all_gene_results, list(
 data_transposed <- data_transposed[!is.na(data_transposed$mappedId), ]
 # View the first few rows of the transposed data
 print(head(data_transposed[order(data_transposed$mappedId), ]))
-#>     mappedGeneID mappedSymbol mappedEnseGeneID   mappedId                                                   mappedTerm mappedCat
-#> 88         51146        A4GNT  ENSG00000118017 GO:0000139                                               Golgi membrane         2
-#> 105        53947       A4GALT  ENSG00000128274 GO:0000139                                               Golgi membrane         2
-#> 30             2          A2M  ENSG00000175899 GO:0001553                                                luteinization         1
-#> 101        53947       A4GALT  ENSG00000128274 GO:0001576                               globoside biosynthetic process         1
-#> 31             2          A2M  ENSG00000175899 GO:0001869 negative regulation of complement activation, lectin pathway         1
-#> 14             2          A2M  ENSG00000175899 GO:0002020                                             protease binding         0
 
-## Convert gene expression data to pathway-level features
-# Using the `convert_gene_expression_to_pathway_features()` function, we generate pathway-level features
-final_data <- convert_gene_expression_to_pathway_features(input_data, data_transposed, T)
+## Convert gene expression data to pathway-level features / this can take a while
+# Using the `convert_gene_expression_to_pathway_features()` function, we generate PathwayGeneScore and pathway-level features
+final_data <- convert_gene_expression_to_pathway_features(input_data_filtered, data_transposed, T)
 
 # (Optional) Remove NA columns from the final data
-# final_data <- final_data[, colSums(!is.na(final_data)) > 0]
+final_data <- final_data[, colSums(!is.na(final_data)) > 0]
 
 # View the final data
-# print(head(final_data))
+print(head(final_data))
+# Continue with downstream analysis using the pathway-level features
 ```
 
 ## Example 6: Get all Genes for “Adaptive Immune System” and Their Corresponding Cell Marker Scores
@@ -316,5 +348,3 @@ ggplot(df_filtered, aes(x = reorder(cell_term, -foldChange), y = foldChange)) +
     plot.title = element_text(hjust = 0.5, face = "bold")
   )
 ```
-
-<img src="man/figures/README-example-6-1.png" width="100%" />
