@@ -1,3 +1,7 @@
+# genular 1.0.1
+
+- Improved vignette documentation and examples for all functions.
+
 # Genular R API Package 1.0.0
 
 ## Initial Release
