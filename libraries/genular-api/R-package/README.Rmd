@@ -195,7 +195,7 @@ search_example_5 <- fetch_all_gene_search_results(
   matchType = "exact",  # Type of matching to use for the query
   organismType = list(c(9606)),  # Specify the organism type (e.g., Homo sapiens)
   ontologyCategories = list(),  # Specify ontology categories if needed
-  limit = 100,  # Limit the number of results returned (API key specific page_limit in php backend)
+  limit = 100,  # Limit the number of results returned
   options = list(api_key = API_KEY, timeout = 1000)  # API key and timeout for the request
 )
 
