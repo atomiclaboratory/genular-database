@@ -231,7 +231,7 @@ print(head(final_data))
 ```
 
 ## Example 6: Get all Genes for "Adaptive Immune System" and Their Corresponding Cell Marker Scores
-```{r example-6, message=FALSE, warning=FALSE}
+```{r example-6, message=FALSE, warning=FALSE, eval=FALSE}
 # This example demonstrates how to retrieve genes associated with the "Adaptive Immune System" and process their corresponding cell marker scores for further analysis. We use `fetch_all_gene_search_results()` to obtain gene information, followed by data filtering and visualization steps.
 
 # Fetch genes related to "Adaptive Immune System"
