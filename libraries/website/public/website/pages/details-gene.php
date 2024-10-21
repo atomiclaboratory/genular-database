@@ -85,7 +85,7 @@ lastVisitedPageCache('gene-details', [
                         <div class="gene-details">
                             <?php if (isset($geneDetailsSchema['geneID'])): ?>
                             <div class="card mb-3 border-0">
-                                <div class="card-body">
+                                <div class="card-body pl-0">
                                     <?php if (!empty($geneDetailsSchema['geneID'])): ?>
                                         <p class="card-text"><strong>Gene ID:</strong> <span class="text-primary"><?= htmlspecialchars($geneDetailsSchema['geneID']) ?></span></p>
                                     <?php endif; ?>
@@ -128,7 +128,7 @@ lastVisitedPageCache('gene-details', [
                         <?php if (!empty($geneDetailsSchema['ontology'])): ?>
                         <h2>Associated with</h2>
                         <div class="card mb-3 border-0" style="max-height: 500px; overflow-y: scroll;">
-                            <div class="card-body">
+                            <div class="card-body pl-0">
                                 <ul class="list-unstyled">
                                 <?php 
                                 // Extract terms and ids
@@ -195,9 +195,9 @@ lastVisitedPageCache('gene-details', [
                         if (isset($geneDetailsSchema['singleCellExpressions']['effectSizes']) && !empty($geneDetailsSchema['singleCellExpressions']['effectSizes'])):
                     ?>
                     <h2>Cells (max top 100)</h2>
-                    <p><small>(Marker Score score is uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
+                    <p><small>(Marker Scores and respective Thresholds are uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
                     <div class="card mb-3 border-0" style="max-height: 250px; overflow-y: scroll;">
-                        <div class="card-body">
+                        <div class="card-body pl-0">
                             <?php
                                 echo '<ul class="list-unstyled">';
                                 // Sort the 'effectSizes' array by 'foldChange' in descending order
@@ -215,8 +215,8 @@ lastVisitedPageCache('gene-details', [
                                     
                                     echo '<li style="padding-bottom: 5px;">';
                                     echo '<strong>Cell Name:</strong> ' . $cellTerm . ' <span style="float: right;"><small>(<a href="'.$_ENV['WEB_URL'] . '/details-cell/' . $cellId . '">' . $cellId . '</a>)</small></span><br>';
-                                    echo '<i>Fold Change:</i> ' . $foldChange . '<br>';
-                                    echo '<i>Marker Score:</i> ' . number_format($markerScore);
+                                    echo '<i title="Difference between Marker Score and Marker Score Threshold">Fold Change:</i> ' . $foldChange . '<br>';
+                                    echo '<i title="Specific Marker Score for this cell in current gene">Marker Score:</i> ' . number_format($markerScore);
                                     echo '</li>';
                                 }
 
@@ -527,10 +527,10 @@ lastVisitedPageCache('gene-details', [
                 <div class="loader"></div> <!-- This will be your spinner or loading animation -->
             </div>
             <div class="container-lg">
-                <div class="text-left">
+                 <div class="text-left">
                     <h2>Database document:</h2>
                     <p id="searchDescription" class="mt-2" style="text-align: left;">
-                        This is <strong>a preview</strong> of the gene's schema. Only a few entries are kept for 'singleCellExpressions,' 'mRNAExpressions,' and other large data arrays for visualization purposes. 
+                        This is <strong>a preview</strong> of the gene's schema. Only a few entries are kept for 'singleCellExpressions,' 'mRNAExpressions,' and other large data arrays for visualization purposes. You can <strong>zoom in with the mouse wheel</strong> for a closer view, and the text will adjust automatically if necessary. 
                         For the full schema, <a href="<?php echo $_ENV['WEB_URL'] . '/download/' . $geneID; ?>" target="_blank">download it here</a>.
                     </p>
                 </div>

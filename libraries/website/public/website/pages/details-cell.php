@@ -129,7 +129,7 @@ lastVisitedPageCache('cell-details', [
                         <div class="cell-details">
                             <?php if (isset($cellDetails['cell_id'])): ?>
                             <div class="card mb-3 position-relative border-0">
-                                <div class="card-body">
+                                <div class="card-body pl-0">
                                     <?php if (!empty($cellDetails['cell_id'])): ?>
                                         <p class="card-text">
                                             <strong>Cell ID:</strong> <span class="text-primary"><?= htmlspecialchars($cellDetails['cell_id']) ?></span>
@@ -183,7 +183,7 @@ lastVisitedPageCache('cell-details', [
                     <?php if ($depiction): ?>
                         <h2>Image representation</h2>
                         <div class="card mb-3 border-0">
-                            <div class="card-body">
+                            <div class="card-body pl-0">
                                 <img src="<?= htmlspecialchars($depiction) ?>" alt="Depiction of <?= htmlspecialchars($cellDetails['cell_name'] ?? 'the cell') ?>" class="img-fluid">
                                 <div class="text-right">
                                     <small><i>Courtesy of <a href="https://www.swissbiopics.org/" target="_blank">SwissBioPics</a></i></small>
@@ -198,7 +198,7 @@ lastVisitedPageCache('cell-details', [
                         <h2>Genes (max top 100)</h2>
                         <p><small>(Marker Score score is uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
                         <div class="card mb-3 border-0" style="max-height: 250px; overflow-y: scroll;">
-                            <div class="card-body">
+                            <div class="card-body pl-0">
                                 <?php
                                 if (count($genesForCell) > 0) {
                                     echo '<ul class="list-unstyled">';
@@ -221,7 +221,8 @@ lastVisitedPageCache('cell-details', [
 
                                         echo '<li style="padding-bottom: 5px;">';
                                         echo '<strong>Gene Symbol:</strong> ' . $geneSymbol . ' <span style="float: right;"><small>(<a href="'.$_ENV['WEB_URL'] . '/details-gene/' . $geneId . '">' . $ensemblId . '</a>)</small></span><br>';
-                                        echo '<i title="Fold Change (across all tissues)">Fold Change:</i> ' . $foldChange . '<br>';
+                                        echo '<i title="Difference between Marker Score and Marker Score Threshold for this cell in specific gene">Fold Change:</i> ' . $foldChange . '<br>';
+
                                         echo '<i>Ensembl ID:</i> ' . $ensemblId;
                                         echo '</li>';
                                     }
