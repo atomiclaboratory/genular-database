@@ -57,12 +57,12 @@ class GeneController
         $this->ontologyCategories = [];
         $this->fieldsFilter = [];
     }
-
+    
     /**
      * @OA\Post(
      *     path="/api/v1/gene/search",
      *     tags={"Gene Search"},
-     *     summary="Retrieves any gene information based on the provided search input criteria",
+     *     summary="Retrieve gene information based on the provided search criteria",
      *     operationId="getGeneInfo",
      *     @OA\RequestBody(
      *         description="JSON object containing search criteria",
@@ -72,39 +72,74 @@ class GeneController
      *             @OA\Property(
      *                 property="queryFields",
      *                 type="array",
+     *                 description="Array of fields to search by, such as geneID, symbol, etc.",
      *                 @OA\Items(type="string"),
-     *                 example=["geneID", "symbol"]
+     *                 example={"geneID", "symbol"}
      *             ),
      *             @OA\Property(
      *                 property="queryValues",
      *                 type="array",
+     *                 description="Array of values corresponding to the fields in queryFields.",
      *                 @OA\Items(type="string"),
-     *                 example=["920", "CD8A"]
+     *                 example={"920", "CD8A"}
      *             ),
      *             @OA\Property(
      *                 property="fieldsFilter",
      *                 type="array",
+     *                 description="Fields to include in the response. If not provided, all fields are included.",
      *                 @OA\Items(type="string"),
-     *                 example=["geneID", "symbol", "crossReference.enseGeneID", "protein.sequence.sequence"]
+     *                 example={"geneID", "symbol", "crossReference.enseGeneID", "protein.sequence.sequence"}
      *             ),
      *             @OA\Property(
      *                 property="organismType",
      *                 type="array",
+     *                 description="Array of organism taxon IDs, e.g., 9606 for Homo sapiens.",
      *                 @OA\Items(type="string"),
      *                 example={"9606"}
      *             ),
      *             @OA\Property(
      *                 property="ontologyCategories",
      *                 type="array",
+     *                 description="Array of ontology categories to filter the search.",
      *                 @OA\Items(type="string"),
      *                 example={}
      *             ),
-     *             @OA\Property(property="searchType", type="string", example="or"),
-     *             @OA\Property(property="orderBy", type="string", example="geneID"),
-     *             @OA\Property(property="sortDirection", type="string", example="asc"),
-     *             @OA\Property(property="page", type="integer", example=1),
-     *             @OA\Property(property="limit", type="integer", example=10),
-     *             @OA\Property(property="debug", type="integer", example=0),
+     *             @OA\Property(
+     *                 property="searchType",
+     *                 type="string",
+     *                 description="The search operator, can be 'and' or 'or'.",
+     *                 example="or"
+     *             ),
+     *             @OA\Property(
+     *                 property="orderBy",
+     *                 type="string",
+     *                 description="Field to sort the results by.",
+     *                 example="geneID"
+     *             ),
+     *             @OA\Property(
+     *                 property="sortDirection",
+     *                 type="string",
+     *                 description="Direction to sort the results, can be 'asc' or 'desc'.",
+     *                 example="asc"
+     *             ),
+     *             @OA\Property(
+     *                 property="page",
+     *                 type="integer",
+     *                 description="Page number for pagination.",
+     *                 example=1
+     *             ),
+     *             @OA\Property(
+     *                 property="limit",
+     *                 type="integer",
+     *                 description="Maximum number of results per page.",
+     *                 example=10
+     *             ),
+     *             @OA\Property(
+     *                 property="debug",
+     *                 type="integer",
+     *                 description="Flag for enabling debug mode (1 = enabled, 0 = disabled).",
+     *                 example=0
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -112,13 +147,14 @@ class GeneController
      *         description="Successful retrieval of gene information",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="total", type="integer", example=100),
-     *             @OA\Property(property="totalPages", type="integer", example=10),
-     *             @OA\Property(property="currentPage", type="integer", example=1),
-     *             @OA\Property(property="pageLimit", type="integer", example=10),
+     *             @OA\Property(property="total", type="integer", description="Total number of records matching the query.", example=100),
+     *             @OA\Property(property="totalPages", type="integer", description="Total number of pages.", example=10),
+     *             @OA\Property(property="currentPage", type="integer", description="Current page number.", example=1),
+     *             @OA\Property(property="pageLimit", type="integer", description="Number of records per page.", example=10),
      *             @OA\Property(
      *                 property="results",
      *                 type="array",
+     *                 description="Array of genes that match the search criteria.",
      *                 @OA\Items(type="object")
      *             )
      *         )
@@ -129,7 +165,7 @@ class GeneController
      *     ),
      *     security={{"api_key": {}}}
      * )
-     */ 
+     */
     public function getGeneInfo(Request $request, Response $response, array $args)
     {
 

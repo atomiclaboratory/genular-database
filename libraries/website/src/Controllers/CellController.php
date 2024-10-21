@@ -64,7 +64,7 @@ class CellController
      *     path="/api/v1/cells/search",
      *     summary="Get information about genes for specified cells.",
      *     tags={"Cell Search"},
-     *     description="Retrieve all genes for the specified cells where cell marker score in specific gene is greater than or equal to the given threshold.",
+     *     description="Retrieve all genes for the specified cells where the cell marker score for a specific gene is greater than or equal to the given threshold.",
      *     @OA\RequestBody(
      *         required=true,
      *         description="Parameters to query cell information",
@@ -72,15 +72,14 @@ class CellController
      *             required={"queryValues"},
      *             @OA\Property(
      *                 property="queryValues",
-     *                 type="array",
-     *                 description="Array of objects where each object represents a cell ID and its condition.",
-     *                 @OA\Items(type="object"),
-     *                 example=[{"CL0000236": ">= 35"}, {"CL0000235": "< 25"}]
+     *                 type="object",
+     *                 description="Object where each key is a cell ID, and the value represents the condition (e.g., '>=', '<') and threshold.",
+     *                 example={"CL0000236": ">= 35", "CL0000235": "< 25"}
      *             ),
      *             @OA\Property(
      *                 property="fieldsFilter",
      *                 type="array",
-     *                 description="Fields to include in the response. If empty or not provided, all fields are included.",
+     *                 description="Array of fields to include in the response. If empty or not provided, all fields will be included.",
      *                 @OA\Items(type="string"),
      *                 example={"geneID", "symbol", "singleCellExpressions.effectSizes"}
      *             ),
@@ -93,7 +92,7 @@ class CellController
      *             @OA\Property(
      *                 property="sortDirection",
      *                 type="string",
-     *                 description="Direction to sort the results, can be 'asc' or 'desc'.",
+     *                 description="Direction to sort the results. Can be 'asc' or 'desc'.",
      *                 example="asc"
      *             ),
      *             @OA\Property(
@@ -105,7 +104,7 @@ class CellController
      *             @OA\Property(
      *                 property="limit",
      *                 type="integer",
-     *                 description="Maximum number of results per page. The maximum is capped at 100.",
+     *                 description="Maximum number of results per page, capped at 100.",
      *                 example=10
      *             )
      *         )
@@ -118,7 +117,7 @@ class CellController
      *             @OA\Property(
      *                 property="total",
      *                 type="integer",
-     *                 description="Total number of records that match the query, disregarding limit and page."
+     *                 description="Total number of records that match the query, ignoring pagination."
      *             ),
      *             @OA\Property(
      *                 property="totalPages",
@@ -150,6 +149,7 @@ class CellController
      *     security={ {"api_key": {}} }
      * )
      */
+
     public function getCellsInfo(Request $request, Response $response, array $args) 
     {
         $this->userDetails = $request->getAttribute('userDetails');
@@ -396,8 +396,8 @@ class CellController
      * @OA\Post(
      *     path="/api/v1/cells/suggest",
      *     tags={"Cell Suggest"},
-     *     summary="Get details, especially marker score threshold for the specified cells that can be used on cell search to find relevant genes.",
-     *     description="This method finds cells based on user query and sorts them by lineages.",
+     *     summary="Suggest cell details, including marker score thresholds for the specified cells, to be used in cell search for relevant genes.",
+     *     description="This method identifies cells based on the user's query and sorts them by their lineages.",
      *     @OA\RequestBody(
      *         description="JSON object containing query values",
      *         required=true,
@@ -406,9 +406,10 @@ class CellController
      *             @OA\Property(
      *                 property="queryValues",
      *                 type="array",
+     *                 description="Array of cell types to search for.",
      *                 @OA\Items(type="string"),
-     *                 example=["endothelial cell", "T cell"]
-     *             ),
+     *                 example={"endothelial cell", "T cell"}
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -419,18 +420,24 @@ class CellController
      *             @OA\Property(
      *                 property="response",
      *                 type="array",
+     *                 description="Array of suggested cells that match the query.",
      *                 @OA\Items(type="object")
      *             ),
-     *             @OA\Property(property="total", type="integer"),
+     *             @OA\Property(
+     *                 property="total",
+     *                 type="integer",
+     *                 description="Total number of suggested cells."
+     *             )
      *         )
      *     ),
      *     @OA\Response(
-     *         response="400",
+     *         response=400,
      *         description="Invalid input"
      *     ),
      *     security={ {"api_key": {}} }
      * )
      */
+
     public function suggestCells(Request $request, Response $response, array $args)
     {
 
