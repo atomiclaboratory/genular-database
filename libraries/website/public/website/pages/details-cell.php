@@ -128,7 +128,7 @@ lastVisitedPageCache('cell-details', [
                         <h2>Details for: <?= htmlspecialchars($cellDetails['cell_id']) ?></h2>
                         <div class="cell-details">
                             <?php if (isset($cellDetails['cell_id'])): ?>
-                            <div class="card mb-3 position-relative">
+                            <div class="card mb-3 position-relative border-0">
                                 <div class="card-body">
                                     <?php if (!empty($cellDetails['cell_id'])): ?>
                                         <p class="card-text">
@@ -182,7 +182,7 @@ lastVisitedPageCache('cell-details', [
                 <div class="col-md-6 text-left mb-4">
                     <?php if ($depiction): ?>
                         <h2>Image representation</h2>
-                        <div class="card mb-3">
+                        <div class="card mb-3 border-0">
                             <div class="card-body">
                                 <img src="<?= htmlspecialchars($depiction) ?>" alt="Depiction of <?= htmlspecialchars($cellDetails['cell_name'] ?? 'the cell') ?>" class="img-fluid">
                                 <div class="text-right">
@@ -197,7 +197,7 @@ lastVisitedPageCache('cell-details', [
                     ?>
                         <h2>Genes (max top 100)</h2>
                         <p><small>(Marker Score score is uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
-                        <div class="card mb-3" style="max-height: 250px; overflow-y: scroll;">
+                        <div class="card mb-3 border-0" style="max-height: 250px; overflow-y: scroll;">
                             <div class="card-body">
                                 <?php
                                 if (count($genesForCell) > 0) {
@@ -268,8 +268,8 @@ lastVisitedPageCache('cell-details', [
                     <div class="tab-pane fade" id="cell-treemap-single-content" role="tabpanel" aria-labelledby="cell-treemap-single-tab">
                         <div id="cell-treemap-single" style="width: 100%;"></div>
 
-                        <div id="hover-info-cell-single" class="card shadow-sm mt-4">
-                            <div class="card-body">
+                        <div id="hover-info-cell-single">
+                            <div class="card-body pl-0 pr-0">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="card-title"></h5>
                                     <button id="copy-button-cell-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-single')">
@@ -285,8 +285,8 @@ lastVisitedPageCache('cell-details', [
                     <div class="tab-pane fade show active" id="cell-treemap-grouped-content" role="tabpanel" aria-labelledby="cell-treemap-grouped-tab">
                         <div id="cell-treemap-grouped" style="width: 100%;"></div>
 
-                        <div id="hover-info-cell-grouped" class="card shadow-sm mt-4">
-                            <div class="card-body">
+                        <div id="hover-info-cell-grouped">
+                            <div class="card-body pl-0 pr-0">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="card-title"></h5>
                                     <button id="copy-button-cell-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-grouped')">

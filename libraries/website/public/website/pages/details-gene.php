@@ -84,7 +84,7 @@ lastVisitedPageCache('gene-details', [
                         <h2>Details for: <?= htmlspecialchars($geneDetailsSchema['symbol']) ?></h2>
                         <div class="gene-details">
                             <?php if (isset($geneDetailsSchema['geneID'])): ?>
-                            <div class="card mb-3">
+                            <div class="card mb-3 border-0">
                                 <div class="card-body">
                                     <?php if (!empty($geneDetailsSchema['geneID'])): ?>
                                         <p class="card-text"><strong>Gene ID:</strong> <span class="text-primary"><?= htmlspecialchars($geneDetailsSchema['geneID']) ?></span></p>
@@ -127,7 +127,7 @@ lastVisitedPageCache('gene-details', [
                     <div class="col-md-6 text-left mb-4">
                         <?php if (!empty($geneDetailsSchema['ontology'])): ?>
                         <h2>Associated with</h2>
-                        <div class="card mb-3" style="max-height: 500px; overflow-y: scroll;">
+                        <div class="card mb-3 border-0" style="max-height: 500px; overflow-y: scroll;">
                             <div class="card-body">
                                 <ul class="list-unstyled">
                                 <?php 
@@ -196,7 +196,7 @@ lastVisitedPageCache('gene-details', [
                     ?>
                     <h2>Cells (max top 100)</h2>
                     <p><small>(Marker Score score is uniquely calculated using our advanced thresholding algorithms to reveal cell-specific gene markers)</small></p>
-                    <div class="card mb-3" style="max-height: 250px; overflow-y: scroll;">
+                    <div class="card mb-3 border-0" style="max-height: 250px; overflow-y: scroll;">
                         <div class="card-body">
                             <?php
                                 echo '<ul class="list-unstyled">';
@@ -255,8 +255,8 @@ lastVisitedPageCache('gene-details', [
                 <div class="tab-pane fade" id="gene-treemap-single-content" role="tabpanel" aria-labelledby="gene-treemap-single-tab">
                     <div id="gene-treemap-single" style="width: 100%;"></div>
 
-                    <div id="hover-info-single" class="card shadow-sm mt-4">
-                        <div class="card-body">
+                    <div id="hover-info-single">
+                        <div class="card-body pl-0 pr-0">
                             <div class="d-flex justify-content-between">
                                 <h5 class="card-title"></h5>
                                 <button id="copy-button-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('single')">
@@ -273,8 +273,8 @@ lastVisitedPageCache('gene-details', [
                 <div class="tab-pane fade" id="gene-treemap-grouped-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-tab">
                     <div id="gene-treemap-grouped" style="width: 100%;"></div>
 
-                    <div id="hover-info-grouped" class="card shadow-sm mt-4">
-                        <div class="card-body">
+                    <div id="hover-info-grouped">
+                        <div class="card-body pl-0 pr-0">
                             <div class="d-flex justify-content-between">
                                 <h5 class="card-title"></h5>
                                 <button id="copy-button-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped')">
@@ -291,8 +291,8 @@ lastVisitedPageCache('gene-details', [
                 <div class="tab-pane fade show active" id="gene-treemap-grouped-details-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-details-tab">
                     <div id="gene-treemap-grouped-details" style="width: 100%;"></div>
 
-                    <div id="hover-info-grouped-details" class="card shadow-sm mt-4">
-                        <div class="card-body">
+                    <div id="hover-info-grouped-details" >
+                        <div class="card-body pl-0 pr-0">
                             <div class="d-flex justify-content-between">
                                 <h5 class="card-title"></h5>
                                 <button id="copy-button-grouped-details" class="btn btn-primary btn-sm" onclick="copyHoverContent('grouped-details')">
