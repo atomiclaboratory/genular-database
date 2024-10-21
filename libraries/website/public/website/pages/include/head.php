@@ -4,35 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle ?? 'genular - gene cell encyclopedia'; ?></title>
+    <title><?php echo $pageTitle ?? 'Genular: Defining Cellular Identity and Function'; ?></title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Genular is a comprehensive gene and cell reference database that provides insights into gene expressions, protein interactions, cellular activity, and disease connections, all in one place.">
-    <meta name="keywords" content="Genular, gene cell encyclopedia, gene database, protein interactions, cell activity, gene research, cellular mapping, gene expressions, human biology, cell atlas">
+    <meta name="description" content="Genular is an advanced platform integrating single-cell RNA-seq data, genomics, and proteomics to define cellular identity and function across tissues and immune contexts.">
+    <meta name="keywords" content="Genular, cellular identity, single-cell RNA-seq, gene expression, proteomics, cell marker scores, immunology, gene signatures, cell differentiation">
     <meta name="author" content="aTomic Lab">
 
     <!-- Open Graph / Facebook Meta Tags -->
-    <meta property="og:title" content="genular - building blocks of life">
-    <meta property="og:description" content="Database for insights into gene functions and cell expressions.">
-    <meta property="og:image" content="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-150x150.png">
+    <meta property="og:title" content="Genular: Defining Cellular Identity and Function">
+    <meta property="og:description" content="Explore a powerful platform for analyzing gene expressions, immune cell functions, and cellular heterogeneity using single-cell RNA-seq data and multi-domain biological information.">
+    <meta property="og:image" content="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/web-app-manifest-512x512.png">
     <meta property="og:url" content="<?php echo $_ENV['WEB_URL']; ?>">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="genular - building blocks of life">
-    <meta name="twitter:description" content="Database for insights into gene functions and cell expressions.">
-    <meta name="twitter:image" content="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-150x150.png">
+    <meta name="twitter:title" content="Genular: Defining Cellular Identity and Function">
+    <meta name="twitter:description" content="Discover how Genular integrates gene expression, proteomics, and single-cell RNA-seq data to define cellular functions and states.">
+    <meta name="twitter:image" content="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/web-app-manifest-512x512.png">
 
+    <!-- Favicon and Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-48x48.png">
     <link rel="manifest" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/site.webmanifest">
-    <link rel="mask-icon" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="mask-icon" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon.svg" color="#5bbad5">
     <link rel="shortcut icon" href="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon.ico">
+
+    <!-- Windows-specific and Theme color Meta Tags -->
     <meta name="msapplication-TileColor" content="#2d89ef">
     <meta name="msapplication-config" content="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<?php echo $_ENV['WEB_URL']; ?>/static/3rdparty/cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
@@ -82,8 +86,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <!-- Logo with responsive utility classes to hide on mobile -->
-                <a class="navbar-brand d-none d-lg-block" title="genular - homepage" href="/">
-                    <img src="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/favicon-150x150.png" alt="genular logo" height="75" class="d-inline-block align-text-top">
+                <a class="navbar-brand d-none d-lg-block" title="Home" href="/">
+                    <img src="<?php echo $_ENV['WEB_URL']; ?>/static/favicon/original_small.png" alt="genular logo" height="75" class="d-inline-block align-text-top">
                 </a>
                 <div class="collapse navbar-collapse" id="navbarNav">
                    <ul class="navbar-nav">
