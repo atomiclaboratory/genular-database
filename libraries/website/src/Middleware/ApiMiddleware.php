@@ -46,7 +46,7 @@ class ApiMiddleware
             return $handler->handle($request);
         }
 
-        $apiKey = $request->getQueryParams()['api_key'] ?? null;
+        $apiKey = $request->getQueryParams()['api_key'] ?? $request->getHeaderLine('X-API-Key');
         $apiKeyDetails = $this->getApiKeyDetails();
         $clientIp = $request->getAttribute('ip_address', $request->getServerParams()['REMOTE_ADDR']);
 

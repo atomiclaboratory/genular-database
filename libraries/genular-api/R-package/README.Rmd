@@ -344,3 +344,70 @@ ggplot(df_filtered, aes(x = reorder(cell_term, -foldChange), y = foldChange)) +
   )
 ```
 
+## Example 7: Gene Expression Feature Engineering (Cell Features / CellMarkerScore)
+```{r example-7, message=FALSE, warning=FALSE, eval=FALSE}
+# This example demonstrates how to convert genes to cells based on the "CellMarkerScore" metric. We use the `convert_genes_to_cells()` function to transform gene data into cell data by calculating the CellMarkerScore for each cell type.
+
+
+# Define gene expression data for a set of genes across multiple samples
+# Demo data HIPC - Expression data with meta
+remote_data <- "https://genular.ams3.cdn.digitaloceanspaces.com/database-export/hipc_expression_data_with_meta.csv"
+input_data <- read.csv2(remote_data, header = TRUE, sep = ",", dec = ".", quote = "\"", fill = TRUE, comment.char = "")
+
+library(stats)
+
+# START DATA PREPROCESSING
+# This is just an example of how to preprocess the data before using the genular API
+# If you have raw gene expression data, probbably you will need to preprocess it before using the Genular API (eg. DESeq2)
+metadata <- input_data[, 1:36]  # Extract the first 36 columns as metadata
+input_data_counts <- input_data[, 37:ncol(input_data)]  # Extract gene expression data
+
+scaled_data <- scale(input_data_counts)
+
+# Perform PCA on the scaled data
+pca_results <- prcomp(scaled_data, center = TRUE, scale. = TRUE)
+# Get the explained variance proportions for each principal component
+explained_variance <- summary(pca_results)$importance[2,]
+# Find the number of principal components explaining 90% of the variance
+cumulative_variance <- cumsum(explained_variance)
+num_components <- which(cumulative_variance >= 0.90)[1]
+# Get the PCA loadings (rotation matrix)
+loadings <- pca_results$rotation[, 1:num_components]
+# Calculate the variance contribution of each variable by squaring the loadings
+# and multiplying by the variance explained by the respective component
+variance_contributions <- rowSums((loadings^2) * explained_variance[1:num_components])
+# Rank variables by their contribution to the variance
+ranked_variables <- sort(variance_contributions, decreasing = TRUE)
+# Determine how many variables to retain (e.g., 90% of the cumulative variance contribution)
+cumulative_var_contrib <- cumsum(ranked_variables) / sum(ranked_variables)
+# Find the number of variables that cumulatively contribute to 0.75% of the variance explained by these variables
+num_important_variables <- which(cumulative_var_contrib >= 0.75)[1]
+# Select the top contributing variables
+important_variables <- names(ranked_variables[1:num_important_variables])
+# Subset input_data_counts to include only the important variables
+input_data_filtered <- input_data_counts[, important_variables]
+
+search_example_7 <- fetch_all_gene_search_results(
+  queryFields = list(c("symbol")),  # Specify that the query is based on gene symbols
+  queryValues = colnames(input_data_filtered),  # Gene symbols extracted from the column names of 'input_data'
+  fieldsFilter = c("geneID", "symbol", "crossReference.enseGeneID", 
+                   "singleCellExpressions.effectSizes.i", 
+                   "singleCellExpressions.effectSizes.c", 
+                   "singleCellExpressions.effectSizes.s",
+                   "singleCellExpressions.effectSizes.foldChange"),  
+  searchType = "or",  # Search type specifying how to combine query fields
+  orderBy = "geneID",  # Order the results by gene ID
+  sortDirection = "asc",  # Sort direction: ascending
+  responseType = "json",  # Format of the response
+  matchType = "exact",  # Type of matching to use for the query
+  organismType = list(c(9606)),  # Specify the organism type (e.g., Homo sapiens)
+  ontologyCategories = list(),  # Specify ontology categories if needed
+  limit = 100,  # Limit the number of results returned
+  options = list(api_key = API_KEY, timeout = 1000)  # API key and timeout for the request
+)
+
+
+
+
+```
+
