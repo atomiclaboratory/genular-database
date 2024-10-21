@@ -92,7 +92,7 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                    <ul class="navbar-nav">
                         <li class="nav-item <?php echo $pathSegments[0] == '' ? 'active' : ''; ?>">
-                            <a class="nav-link" title="Database Access" href="/home#api-documentation">Database Access</a></li>
+                            <a class="nav-link" title="Home >> Database Access" href="/home#api-documentation">Database Access</a></li>
                         <li class="nav-item">
                             <a class="nav-link" title="API Docs" href="/api-docs" target="_blank">API Docs</a></li>
                             
