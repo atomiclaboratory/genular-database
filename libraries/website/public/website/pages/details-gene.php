@@ -216,7 +216,7 @@ lastVisitedPageCache('gene-details', [
                                     echo '<li style="padding-bottom: 5px;">';
                                     echo '<strong>Cell Name:</strong> ' . $cellTerm . ' <span style="float: right;"><small>(<a href="'.$_ENV['WEB_URL'] . '/details-cell/' . $cellId . '">' . $cellId . '</a>)</small></span><br>';
                                     echo '<i>Fold Change:</i> ' . $foldChange . '<br>';
-                                    echo '<i>Marker Score:</i> ' . $markerScore;
+                                    echo '<i>Marker Score:</i> ' . number_format($markerScore);
                                     echo '</li>';
                                 }
 

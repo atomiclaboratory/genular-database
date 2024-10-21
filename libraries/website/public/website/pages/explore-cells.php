@@ -55,8 +55,8 @@ include __DIR__ . '/include/head.php';
                         echo "<a href='{$detailsUrl}' class='card-link text-decoration-none'>";
                         echo "<h5 class='card-title mb-0 d-flex justify-content-between align-items-center'>Cell ID: " . htmlspecialchars($cell['cell_id']) . "</h5>";
                         echo "</a>";
-                        echo "<p class='card-text mb-0'>Cell Name: " . htmlspecialchars($cell['cell_name']) . "</p>";
-                        echo "<p class='card-text mb-0'>Marker Score: " . htmlspecialchars(round($cell['marker_score'])) . "</p>";
+                        echo "<p class='card-text mb-0'>Cell Name: " . ucwords(htmlspecialchars($cell['cell_name'])) . "</p>";
+                        echo "<p class='card-text mb-0'>Marker Score Threshold: " . htmlspecialchars(number_format(round($cell['marker_score']))) . "</p>";
                         echo "</div>";  // Close card-body
 
 				        // Add icon if there are child cells
@@ -65,7 +65,7 @@ include __DIR__ . '/include/head.php';
 				            $popoverContent = '<ul style="padding-left: 1em; margin: 0;">';
 				            foreach ($cell['childs'] as $child) {
 							    // Generate the details URL for the child cell
-							    $childDetailsUrl = htmlspecialchars($_ENV['WEB_URL'] . "/details-cell/" . $childId, ENT_QUOTES, 'UTF-8');
+							    $childDetailsUrl = htmlspecialchars($_ENV['WEB_URL'] . "/details-cell/" . $child['cell_id'], ENT_QUOTES, 'UTF-8');
 
 				                $childIdEscaped = htmlspecialchars($child['cell_id'], ENT_QUOTES, 'UTF-8');
 				                $childNameEscaped = htmlspecialchars($child['cell_name'], ENT_QUOTES, 'UTF-8');

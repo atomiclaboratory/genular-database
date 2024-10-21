@@ -144,7 +144,7 @@ lastVisitedPageCache('cell-details', [
 
                                     <?php if (!empty($cellDetails['marker_score'])): ?>
                                         <p class="card-text" title="Marker Score Threshold (across all tissues)">
-                                            <strong>Marker Score Threshold:</strong> <span class="text-info"><?= round(htmlspecialchars($cellDetails['marker_score'])) ?></span>
+                                            <strong>Marker Score Threshold:</strong> <span class="text-info"><?= number_format(round(htmlspecialchars($cellDetails['marker_score']))) ?></span>
                                             <br />
                                             <small>
                                                 (Derived using integrated single-cell and genomic data)
