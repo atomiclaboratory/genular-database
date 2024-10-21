@@ -50,6 +50,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-wordcloud"></script>
     
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <script src="https://unpkg.com/wavesurfer.js@7"></script>
 
     <script type="text/javascript" src="<?php echo $_ENV['WEB_URL']; ?>/static/canvas.js"></script>
 </body>

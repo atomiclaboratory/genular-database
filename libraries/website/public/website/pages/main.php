@@ -108,6 +108,49 @@
               </div>
 
 
+
+                <div class="row py-4">
+                    <div class="col-md-10 mx-auto">
+                        <h4 class="text-center">The Genular Podcast: Genes, Cells, and Discoveries</h4>
+                        <div id="waveform" class="mb-4"></div>
+                        <div class="text-center">
+                            <button id="play-pause" class="btn btn-primary">
+                                <i class="fa fa-play"></i> Play
+                            </button>
+                        </div>
+                        <p class="text-muted text-right">This podcast was generated using advanced AI technology.</p>
+                    </div>
+                </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Initialize Wavesurfer
+                    const wavesurfer = WaveSurfer.create({
+                        container: '#waveform',
+                        waveColor: '#888',
+                        progressColor: '#2E8B57',
+                        height: 80,
+                        responsive: true
+                    });
+
+                    // Load the podcast file
+                    wavesurfer.load('/static/genular.mp3');
+
+                    // Play/pause button logic
+                    const playPauseButton = document.getElementById('play-pause');
+                    playPauseButton.addEventListener('click', function () {
+                        if (wavesurfer.isPlaying()) {
+                            wavesurfer.pause();
+                            playPauseButton.innerHTML = '<i class="fa fa-play"></i> Play';
+                        } else {
+                            wavesurfer.play();
+                            playPauseButton.innerHTML = '<i class="fa fa-pause"></i> Pause';
+                        }
+                    });
+                });
+                </script>
+
+
                  <div class="row py-4">
                     <div class="col-md-10 mx-auto">
                         <div class="row">
