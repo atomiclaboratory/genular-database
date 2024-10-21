@@ -278,6 +278,13 @@ lastVisitedPageCache('cell-details', [
                                     </button>
                                 </div>
                                 <p id="hover-content-cell-single" class="card-text"></p>
+                                <small class="text-muted">
+                                    <!-- Adjust the explanation for genes -->
+                                    <strong>Gene ID</strong>: A unique numerical identifier for this specific gene.<br />
+                                    <strong>Symbol</strong>: Shortened abbreviation or name that represents this gene.<br />
+                                    <strong>Ensembl Gene ID</strong>: A unique identifier assigned by Ensembl for genomic data mapping.<br />
+                                    <strong>Fold Change</strong>: Indicates the ratio of the gene's expression level in <strong><?php echo $cellDetails['cell_name']; ?></strong> cell compared to a baseline. A fold change greater than 1 suggests significant gene expression.
+                                </small>
                             </div>
                         </div>
 
@@ -295,6 +302,13 @@ lastVisitedPageCache('cell-details', [
                                     </button>
                                 </div>
                                 <p id="hover-content-cell-grouped" class="card-text"></p>
+                                <small class="text-muted">
+                                    <!-- Adjust the explanation for genes -->
+                                    <strong>Gene ID</strong>: A unique numerical identifier for this specific gene.<br />
+                                    <strong>Symbol</strong>: Shortened abbreviation or name that represents this gene.<br />
+                                    <strong>Ensembl Gene ID</strong>: A unique identifier assigned by Ensembl for genomic data mapping.<br />
+                                    <strong>Fold Change</strong>: Indicates the ratio of the gene's expression level in <strong><?php echo $cellDetails['cell_name']; ?></strong> cell compared to a baseline. A fold change greater than 1 suggests significant gene expression.
+                                </small>
                             </div>
                         </div>
                         

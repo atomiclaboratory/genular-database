@@ -264,6 +264,11 @@ lastVisitedPageCache('gene-details', [
                                 </button>
                             </div>
                             <p id="hover-content-single" class="card-text"></p>
+                            <small class="text-muted">
+                                <strong>Cell ID</strong>: Standard Cell Ontology term used for mapping and comparing cells across experiments. Ensures consistency in analyzing cellular functions across tissues.<br />
+                                <strong>Fold Change</strong>: Represents the ratio of the current Marker Score to the Marker Score Threshold, indicating how much the gene expression has changed compared to a baseline.<br />
+                                <strong>Marker Score</strong>: Reflects how strongly a gene is expressed in this cell type. Calculated using techniques like effect size estimation and bootstrapping for reliability.
+                            </small>
                         </div>
                     </div>
 
@@ -282,6 +287,11 @@ lastVisitedPageCache('gene-details', [
                                 </button>
                             </div>
                             <p id="hover-content-grouped" class="card-text"></p>
+                            <small class="text-muted">
+                                <strong>Cell ID</strong>: Standard Cell Ontology term used for mapping and comparing cells across experiments. Ensures consistency in analyzing cellular functions across tissues.<br />
+                                <strong>Fold Change</strong>: Represents the ratio of the current Marker Score to the Marker Score Threshold, indicating how much the gene expression has changed compared to a baseline.<br />
+                                <strong>Marker Score</strong>: Reflects how strongly a gene is expressed in this cell type. Calculated using techniques like effect size estimation and bootstrapping for reliability.
+                            </small>
                         </div>
                     </div>
 
@@ -300,6 +310,11 @@ lastVisitedPageCache('gene-details', [
                                 </button>
                             </div>
                             <p id="hover-content-grouped-details" class="card-text"></p>
+                            <small class="text-muted">
+                                <strong>Cell ID</strong>: Standard Cell Ontology term used for mapping and comparing cells across experiments. Ensures consistency in analyzing cellular functions across tissues.<br />
+                                <strong>Fold Change</strong>: Represents the ratio of the current Marker Score to the Marker Score Threshold, indicating how much the gene expression has changed compared to a baseline.<br />
+                                <strong>Marker Score</strong>: Reflects how strongly a gene is expressed in this cell type. Calculated using techniques like effect size estimation and bootstrapping for reliability.
+                            </small>
                         </div>
                     </div>
 
