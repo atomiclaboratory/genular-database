@@ -254,7 +254,7 @@ lastVisitedPageCache('gene-details', [
                 <!-- TAB 1: TREEMAP SINGLE -->
                 <div class="tab-pane fade" id="gene-treemap-single-content" role="tabpanel" aria-labelledby="gene-treemap-single-tab">
                     <div id="gene-treemap-single" style="width: 100%;"></div>
-                    <!-- Hover Info Section for Single Treemap -->
+
                     <div id="hover-info-single" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
@@ -263,7 +263,7 @@ lastVisitedPageCache('gene-details', [
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
                             </div>
-                            <p id="hover-content-single" class="card-text">Hover over a box to see details here...</p>
+                            <p id="hover-content-single" class="card-text"></p>
                         </div>
                     </div>
 
@@ -273,7 +273,6 @@ lastVisitedPageCache('gene-details', [
                 <div class="tab-pane fade" id="gene-treemap-grouped-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-tab">
                     <div id="gene-treemap-grouped" style="width: 100%;"></div>
 
-                    <!-- Hover Info Section for Grouped Treemap -->
                     <div id="hover-info-grouped" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
@@ -285,13 +284,13 @@ lastVisitedPageCache('gene-details', [
                             <p id="hover-content-grouped" class="card-text"></p>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- TAB 3: TREEMAP GROUPED DETAILS -->
                 <div class="tab-pane fade show active" id="gene-treemap-grouped-details-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-details-tab">
                     <div id="gene-treemap-grouped-details" style="width: 100%;"></div>
 
-                    <!-- Hover Info Section for Grouped Details Treemap -->
                     <div id="hover-info-grouped-details" class="card shadow-sm mt-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
@@ -303,6 +302,7 @@ lastVisitedPageCache('gene-details', [
                             <p id="hover-content-grouped-details" class="card-text"></p>
                         </div>
                     </div>
+
                 </div>
             </div>
 

@@ -267,6 +267,7 @@ lastVisitedPageCache('cell-details', [
                     <!-- TAB 1: TREEMAP single -->
                     <div class="tab-pane fade" id="cell-treemap-single-content" role="tabpanel" aria-labelledby="cell-treemap-single-tab">
                         <div id="cell-treemap-single" style="width: 100%;"></div>
+
                         <div id="hover-info-cell-single" class="card shadow-sm mt-4">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
@@ -278,10 +279,12 @@ lastVisitedPageCache('cell-details', [
                                 <p id="hover-content-cell-single" class="card-text"></p>
                             </div>
                         </div>
+
                     </div>
                     <!-- TAB 2: TREEMAP grouped -->
                     <div class="tab-pane fade show active" id="cell-treemap-grouped-content" role="tabpanel" aria-labelledby="cell-treemap-grouped-tab">
                         <div id="cell-treemap-grouped" style="width: 100%;"></div>
+
                         <div id="hover-info-cell-grouped" class="card shadow-sm mt-4">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
@@ -293,6 +296,7 @@ lastVisitedPageCache('cell-details', [
                                 <p id="hover-content-cell-grouped" class="card-text"></p>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
 

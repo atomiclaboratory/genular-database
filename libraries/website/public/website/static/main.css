@@ -372,3 +372,7 @@ section.full-screen-section-details {
     white-space: pre-wrap; /* Ensures line breaks are preserved */
 }
 
+/* Target only the hover-info cards for treemap */
+[id^="hover-info-"] {
+    display: none; /* Initially hide all hover info cards */
+}

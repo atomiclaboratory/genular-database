@@ -460,6 +460,106 @@ function renderWordCloud() {
 }
 
 
+function copyHoverContent(type) {
+    const hoverText = document.getElementById(`hover-content-${type}`).innerText;
+    const tempInput = document.createElement("textarea");
+    tempInput.value = hoverText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("Copied to clipboard!");
+}
+
+function updateHoverContent(type, content) {
+    const hoverContentDiv = document.getElementById(`hover-content-${type}`);
+    const hoverInfoCard = document.getElementById(`hover-info-${type}`);
+
+    hoverContentDiv.innerHTML = content;
+
+    // Show the card only if there's content, otherwise hide it
+    if (content.trim() !== "") {
+        hoverInfoCard.style.display = "block"; // Show the card
+    } else {
+        hoverInfoCard.style.display = "none";  // Hide the card
+    }
+}
+
+
+function plotCellTreemapSingle() {
+    showLoadingBar();
+    const rootNode = "All Genes"; // Define a default root
+    const labels = [rootNode, ...genesForCellData.map((d) => d.symbol)];
+    const parents = ["", ...genesForCellData.map(() => rootNode)]; // All genes are children of the root node
+    const values = [0, ...genesForCellData.map((d) => (d.foldChange !== undefined && !isNaN(d.foldChange) ? parseFloat(d.foldChange) : 0))];
+
+
+
+        const hoverTexts = [
+        rootNode, // Root node hover text
+        ...genesForCellData.map((d) => {
+            const geneURL = `${WEB_URL}/details-gene/${d.geneID}`;
+            return `<b>Gene ID:</b> <a href="${geneURL}" target="_blank">${d.geneID}</a><br><b>Symbol:</b> ${d.symbol}<br><b>Ensembl Gene ID:</b> ${d.crossReference.enseGeneID}<br><b>Fold Change:</b> ${d.foldChange}`;
+        }),
+    ];
+
+    // Create trace for treemap with a root node
+    const trace = {
+        type: "treemap",
+        labels: labels,
+        parents: parents,
+        values: values,
+        textinfo: "label+value",
+        textposition: "middle center",
+        marker: {
+            colorscale: "Cividis",
+            colors: values, // Color based on foldChange
+            showscale: true,
+            colorbar: {
+                title: "Fold Change", // Update colorbar title
+                titleside: "right",
+            },
+        },
+        hovertemplate: "%{text}<extra></extra>", // Use custom hover text without extra box
+        text: hoverTexts,
+    };
+
+    const layout = {
+        margin: { l: 0, r: 0, t: 50, b: 0 },
+        hovermode: "closest",
+        plot_bgcolor: "#FFFFFF",
+        paper_bgcolor: "#FFFFFF",
+        autosize: true,
+        showlegend: false,
+    };
+
+    const config = {
+        toImageButtonOptions: {
+            format: "svg", // one of png, svg, jpeg, webp
+            filename: "genular_export",
+            height: 1024,
+            width: 768,
+            scale: 1,
+        },
+    };
+
+    Plotly.newPlot("cell-treemap-single", [trace], layout, config).then(() => {
+        hideLoadingBar();
+    });
+
+    const cellTreemapDiv = document.getElementById("cell-treemap-single");
+    cellTreemapDiv.on("plotly_hover", function (eventData) {
+        const pointData = eventData.points[0];
+
+        if(pointData.label === "All Genes") {
+            return;
+        }
+
+        const hoverContent = `${pointData.text}`;
+        updateHoverContent('cell-single', hoverContent);
+    });
+}
+
 
 function plotCellTreemapGrouped() {
     showLoadingBar();
@@ -603,97 +703,11 @@ function plotCellTreemapGrouped() {
         if(pointData.label === "All pathways") {
             return;
         }
-
         const hoverContent = `${pointData.text}`;
-
-        document.getElementById("hover-content-cell-grouped").innerHTML = hoverContent;
+        updateHoverContent('cell-grouped', hoverContent);
     });
 }
 
-function plotCellTreemapSingle() {
-    showLoadingBar();
-    const rootNode = "All Genes"; // Define a default root
-    const labels = [rootNode, ...genesForCellData.map((d) => d.symbol)];
-    const parents = ["", ...genesForCellData.map(() => rootNode)]; // All genes are children of the root node
-    const values = [0, ...genesForCellData.map((d) => (d.foldChange !== undefined && !isNaN(d.foldChange) ? parseFloat(d.foldChange) : 0))];
-
-
-
-        const hoverTexts = [
-        rootNode, // Root node hover text
-        ...genesForCellData.map((d) => {
-            const geneURL = `${WEB_URL}/details-gene/${d.geneID}`;
-            return `<b>Gene ID:</b> <a href="${geneURL}" target="_blank">${d.geneID}</a><br><b>Symbol:</b> ${d.symbol}<br><b>Ensembl Gene ID:</b> ${d.crossReference.enseGeneID}<br><b>Fold Change:</b> ${d.foldChange}`;
-        }),
-    ];
-
-    // Create trace for treemap with a root node
-    const trace = {
-        type: "treemap",
-        labels: labels,
-        parents: parents,
-        values: values,
-        textinfo: "label+value",
-        textposition: "middle center",
-        marker: {
-            colorscale: "Cividis",
-            colors: values, // Color based on foldChange
-            showscale: true,
-            colorbar: {
-                title: "Fold Change", // Update colorbar title
-                titleside: "right",
-            },
-        },
-        hovertemplate: "%{text}<extra></extra>", // Use custom hover text without extra box
-        text: hoverTexts,
-    };
-
-    const layout = {
-        margin: { l: 0, r: 0, t: 50, b: 0 },
-        hovermode: "closest",
-        plot_bgcolor: "#FFFFFF",
-        paper_bgcolor: "#FFFFFF",
-        autosize: true,
-        showlegend: false,
-    };
-
-    const config = {
-        toImageButtonOptions: {
-            format: "svg", // one of png, svg, jpeg, webp
-            filename: "genular_export",
-            height: 1024,
-            width: 768,
-            scale: 1,
-        },
-    };
-
-    Plotly.newPlot("cell-treemap-single", [trace], layout, config).then(() => {
-        hideLoadingBar();
-    });
-
-    const cellTreemapDiv = document.getElementById("cell-treemap-single");
-    cellTreemapDiv.on("plotly_hover", function (eventData) {
-        const pointData = eventData.points[0];
-
-        if(pointData.label === "All Genes") {
-            return;
-        }
-
-        const hoverContent = `${pointData.text}`;
-        document.getElementById("hover-content-cell-single").innerHTML = hoverContent;
-    });
-}
-
-function copyHoverContent(type) {
-    const hoverText = document.getElementById(`hover-content-${type}`).innerText;
-    const tempInput = document.createElement("textarea");
-    tempInput.value = hoverText;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-    alert("Copied to clipboard!");
-}
 
 function plotGeneTreemapSingle() {
     showLoadingBar();
@@ -787,7 +801,7 @@ function plotGeneTreemapSingle() {
             <b>Fold Change:</b> ${foldChange}<br>
             <b>Marker Score:</b> ${markerScore}<br>
         `;
-        document.getElementById("hover-content-single").innerHTML = hoverContent;
+        updateHoverContent('single', hoverContent);
     });
 }
 
@@ -945,7 +959,8 @@ function plotGeneTreemapGrouped() {
         if(pointData.text === "All Cells") {
             return;
         }
-        document.getElementById("hover-content-grouped").innerHTML = pointData.text;
+        const hoverContent = `${pointData.text}`;
+        updateHoverContent('grouped', hoverContent);
     });
 }
 
@@ -1039,7 +1054,9 @@ function plotGeneTreemapGroupedDetails() {
         if (pointData.label === "All Cells") {
             return;
         }
-        document.getElementById("hover-content-grouped-details").innerHTML = pointData.text;
+
+        const hoverContent = `${pointData.text}`;
+        updateHoverContent('grouped-details', hoverContent);
     });
 }
 
