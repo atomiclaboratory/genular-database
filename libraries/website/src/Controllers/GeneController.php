@@ -62,7 +62,7 @@ class GeneController
      * @OA\Post(
      *     path="/api/v1/gene/search",
      *     tags={"Gene Search"},
-     *     summary="Retrieves any gene(s) information based on the provided search criteria",
+     *     summary="Retrieves any gene information based on the provided search input criteria",
      *     operationId="getGeneInfo",
      *     @OA\RequestBody(
      *         description="JSON object containing search criteria",
@@ -73,19 +73,19 @@ class GeneController
      *                 property="queryFields",
      *                 type="array",
      *                 @OA\Items(type="string"),
-     *                 example={"geneID", "symbol"}
+     *                 example=["geneID", "symbol"]
      *             ),
      *             @OA\Property(
      *                 property="queryValues",
      *                 type="array",
      *                 @OA\Items(type="string"),
-     *                 example={"920", "CD8A"}
+     *                 example=["920", "CD8A"]
      *             ),
      *             @OA\Property(
      *                 property="fieldsFilter",
      *                 type="array",
      *                 @OA\Items(type="string"),
-     *                 example={"geneID", "symbol", "crossReference.enseGeneID", "protein.sequence.sequence"}
+     *                 example=["geneID", "symbol", "crossReference.enseGeneID", "protein.sequence.sequence"]
      *             ),
      *             @OA\Property(
      *                 property="organismType",
