@@ -117,9 +117,6 @@ lastVisitedPageCache('cell-details', [
     'name' => $cellDetails['cell_name']
 ]);
 
-
-
-
 ?>
 
 <main role="main" class="flex-shrink-0">
@@ -244,7 +241,7 @@ lastVisitedPageCache('cell-details', [
             </div>
 
 
-            <?php if (!is_null($cellDetails)): ?>
+            <?php if (!is_null($cellDetails) && $cellUnknown === false): ?>
                 <div class="d-flex align-items-center justify-content-between">
                     <ul class="nav nav-tabs" id="cellTreeMapTab" role="tablist">
                         <li class="nav-item">
@@ -273,12 +270,12 @@ lastVisitedPageCache('cell-details', [
                         <div id="hover-info-cell-single" class="card shadow-sm mt-4">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                    <h5 class="card-title"></h5>
                                     <button id="copy-button-cell-single" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-single')">
                                         <i class="fas fa-copy"></i> Copy
                                     </button>
                                 </div>
-                                <p id="hover-content-cell-single" class="card-text">Hover over a box to see details here...</p>
+                                <p id="hover-content-cell-single" class="card-text"></p>
                             </div>
                         </div>
                     </div>
@@ -288,12 +285,12 @@ lastVisitedPageCache('cell-details', [
                         <div id="hover-info-cell-grouped" class="card shadow-sm mt-4">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <h5 class="card-title"><strong>Hovered Details</strong></h5>
+                                    <h5 class="card-title"></h5>
                                     <button id="copy-button-cell-grouped" class="btn btn-primary btn-sm" onclick="copyHoverContent('cell-grouped')">
                                         <i class="fas fa-copy"></i> Copy
                                     </button>
                                 </div>
-                                <p id="hover-content-cell-grouped" class="card-text">Hover over a box to see details here...</p>
+                                <p id="hover-content-cell-grouped" class="card-text"></p>
                             </div>
                         </div>
                     </div>

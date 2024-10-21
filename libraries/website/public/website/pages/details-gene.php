@@ -272,6 +272,7 @@ lastVisitedPageCache('gene-details', [
                 <!-- TAB 2: TREEMAP GROUPED -->
                 <div class="tab-pane fade" id="gene-treemap-grouped-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-tab">
                     <div id="gene-treemap-grouped" style="width: 100%;"></div>
+
                     <!-- Hover Info Section for Grouped Treemap -->
                     <div id="hover-info-grouped" class="card shadow-sm mt-4">
                         <div class="card-body">
@@ -281,7 +282,7 @@ lastVisitedPageCache('gene-details', [
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
                             </div>
-                            <p id="hover-content-grouped" class="card-text">Hover over a box to see details here...</p>
+                            <p id="hover-content-grouped" class="card-text"></p>
                         </div>
                     </div>
                 </div>
@@ -289,6 +290,7 @@ lastVisitedPageCache('gene-details', [
                 <!-- TAB 3: TREEMAP GROUPED DETAILS -->
                 <div class="tab-pane fade show active" id="gene-treemap-grouped-details-content" role="tabpanel" aria-labelledby="gene-treemap-grouped-details-tab">
                     <div id="gene-treemap-grouped-details" style="width: 100%;"></div>
+
                     <!-- Hover Info Section for Grouped Details Treemap -->
                     <div id="hover-info-grouped-details" class="card shadow-sm mt-4">
                         <div class="card-body">
@@ -298,7 +300,7 @@ lastVisitedPageCache('gene-details', [
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
                             </div>
-                            <p id="hover-content-grouped-details" class="card-text">Hover over a box to see details here...</p>
+                            <p id="hover-content-grouped-details" class="card-text"></p>
                         </div>
                     </div>
                 </div>
@@ -635,10 +637,11 @@ if (isset($geneDetailsSchema['singleCellExpressions']['effectSizes']) && !empty(
         $cell_id = $cellExpression['cell_id'];
         if (isset($cellToParentMap[$cell_id])) {
             $cellExpression['parent'] = $cellToParentMap[$cell_id];
-            $cellExpression['label'] = sanitizeGroup($cellExpression['cell_name']);
+            $cellExpression['label'] = sanitizeGroup($cellExpression['cell_term']);
         } else {
+
             $cellExpression['parent'] = $rootNode;
-            $cellExpression['label'] = sanitizeGroup($cellExpression['cell_name']);
+            $cellExpression['label'] = sanitizeGroup($cellExpression['cell_term']);
         }
     }
     unset($cellExpression); // Break the reference

@@ -459,6 +459,8 @@ function renderWordCloud() {
     });
 }
 
+
+
 function plotCellTreemapGrouped() {
     showLoadingBar();
 
@@ -524,23 +526,31 @@ function plotCellTreemapGrouped() {
     const values = [0];
     const hoverTexts = [rootLabel]; // Root node hover text
 
-    // Add pathways and genes to labels, parents, values, and hoverTexts
     groupLabels.forEach((groupLabel) => {
         const group = groupedData[groupLabel];
         labels.push(groupLabel);
         parents.push(rootLabel);
         values.push(group.foldChangeSum); // Use the sum of fold changes for the group
-        hoverTexts.push(`Pathway: ${groupLabel}<br>Sum of Fold Change: ${group.foldChangeSum.toFixed(2)}`);
+
+        // Styled hover text for group
+        hoverTexts.push(
+            `<b>Pathway:</b> ${groupLabel}<br><b>Sum of Fold Change:</b> ${group.foldChangeSum.toFixed(2)}`
+        );
 
         group.genes.forEach((gene) => {
             labels.push(gene.symbol);
             parents.push(groupLabel);
             values.push(gene.foldChange);
+
+            // Use WEB_URL constant to generate the gene details URL
+            const geneURL = `${WEB_URL}/details-gene/${gene.geneID}`;
             hoverTexts.push(
-                `Gene ID: ${gene.geneID}<br>Symbol: ${gene.symbol}<br>Ensembl Gene ID: ${gene.crossReference.enseGeneID}<br>Fold Change: ${gene.foldChange.toFixed(2)}`
+                `<b>Gene ID:</b> <a href="${geneURL}" target="_blank">${gene.geneID}</a><br><b>Symbol:</b> ${gene.symbol}<br><b>Ensembl Gene ID:</b> ${gene.crossReference.enseGeneID}<br><b>Fold Change:</b> ${gene.foldChange.toFixed(2)}`
             );
         });
     });
+
+
 
     // Create the treemap trace
     const trace = {
@@ -589,7 +599,13 @@ function plotCellTreemapGrouped() {
     const cellTreemapGroupedDiv = document.getElementById("cell-treemap-grouped");
     cellTreemapGroupedDiv.on("plotly_hover", function (eventData) {
         const pointData = eventData.points[0]; // Get the first hovered point
+
+        if(pointData.label === "All pathways") {
+            return;
+        }
+
         const hoverContent = `${pointData.text}`;
+
         document.getElementById("hover-content-cell-grouped").innerHTML = hoverContent;
     });
 }
@@ -601,10 +617,14 @@ function plotCellTreemapSingle() {
     const parents = ["", ...genesForCellData.map(() => rootNode)]; // All genes are children of the root node
     const values = [0, ...genesForCellData.map((d) => (d.foldChange !== undefined && !isNaN(d.foldChange) ? parseFloat(d.foldChange) : 0))];
 
-    // Extract additional hover information
-    const hoverTexts = [
+
+
+        const hoverTexts = [
         rootNode, // Root node hover text
-        ...genesForCellData.map((d) => `Gene ID: ${d.geneID}<br>Symbol: ${d.symbol}<br>Ensembl Gene ID: ${d.crossReference.enseGeneID}<br>Fold Change: ${d.foldChange}`),
+        ...genesForCellData.map((d) => {
+            const geneURL = `${WEB_URL}/details-gene/${d.geneID}`;
+            return `<b>Gene ID:</b> <a href="${geneURL}" target="_blank">${d.geneID}</a><br><b>Symbol:</b> ${d.symbol}<br><b>Ensembl Gene ID:</b> ${d.crossReference.enseGeneID}<br><b>Fold Change:</b> ${d.foldChange}`;
+        }),
     ];
 
     // Create trace for treemap with a root node
@@ -653,7 +673,12 @@ function plotCellTreemapSingle() {
 
     const cellTreemapDiv = document.getElementById("cell-treemap-single");
     cellTreemapDiv.on("plotly_hover", function (eventData) {
-        const pointData = eventData.points[0]; // Get the first hovered point
+        const pointData = eventData.points[0];
+
+        if(pointData.label === "All Genes") {
+            return;
+        }
+
         const hoverContent = `${pointData.text}`;
         document.getElementById("hover-content-cell-single").innerHTML = hoverContent;
     });
@@ -678,17 +703,20 @@ function plotGeneTreemapSingle() {
 
     // Extract labels, values, and cell_ids from effectSizesData
     const rootNode = "All Cells"; // Define a default root
-    const labels = [rootNode, ...effectSizesData.map((d) => d.cell_term)];
-    const parents = ["", ...effectSizesData.map(() => rootNode)]; // All cells are children of the root node
-    const values = [0, ...effectSizesData.map((d) => (d.foldChange !== undefined && !isNaN(d.foldChange) ? parseFloat(d.foldChange) : 0))];
-    const cellIDs = [0, ...effectSizesData.map((d) => d.cell_id)];
+
+    const plot_labels = [rootNode, ...effectSizesData.map((d) => d.cell_term)];
+    const plot_parents = ["", ...effectSizesData.map(() => rootNode)];
+
+    const plot_values = [0, ...effectSizesData.map((d) => (d.foldChange !== undefined && !isNaN(d.foldChange) ? parseFloat(d.foldChange) : 0))];
+    const cellIDs = ["N/A", ...effectSizesData.map((d) => d.cell_id)];
+    const markerScore = ["N/A", ...effectSizesData.map((d) => d.markerScore)];
 
     // Create trace for treemap with a root node
     const trace = {
         type: "treemap",
-        labels: labels,
-        parents: parents,
-        values: values,
+        labels: plot_labels,
+        parents: plot_parents,
+        values: plot_values,
         textinfo: "label+value+percent entry",
         hoverinfo: "label+value+text",
         hovertemplate:
@@ -698,14 +726,14 @@ function plotGeneTreemapSingle() {
             "Cell ID: <a href='https://genular.atomic-lab.org/details-cell/%{customdata}' target='_blank'>%{customdata}</a><extra></extra>", // Customize hover tooltip with link
         marker: {
             colorscale: "Cividis",
-            colors: values,
+            colors: plot_values,
             showscale: true,
             colorbar: {
                 title: "Fold Change",
                 titleside: "right",
             },
         },
-        text: effectSizesData.map((d) => d.markerScore), // Include marker score for hover
+        text: markerScore, // Include marker score for hover
         customdata: cellIDs, // Include cell_id in custom data for hover
     };
 
@@ -743,7 +771,11 @@ function plotGeneTreemapSingle() {
         const cellName = pointData.label;
         const foldChange = pointData.value;
         const markerScore = pointData.text;
-        const cellID = pointData.customdata; // Extract cell_id from customdata
+        const cellID = pointData.customdata;
+
+        if (cellID === "N/A") {
+            return;
+        }
 
         // Generate a URL based on cell_id
         const cellURL = `${WEB_URL}/details-cell/${cellID}`;
@@ -808,7 +840,7 @@ function plotGeneTreemapGrouped() {
     });
 
     // Step 3: Create values array
-    const values = uniqueLabels.map((label) => {
+    const plot_values = uniqueLabels.map((label) => {
         if (label === "All Cells") {
             return 0; // Root node
         } else if (groupFoldChangeMap[label] !== undefined) {
@@ -827,19 +859,27 @@ function plotGeneTreemapGrouped() {
         if (label === "All Cells") {
             return label; // Root node hover text
         }
-        if (groupFoldChangeMap[label] !== undefined) {
-            return `Group: ${label}<br>Sum of Fold Change: ${groupFoldChangeMap[label].toFixed(2)}`;
-        }
+
         // Reverse mapping to original label
         const originalLabelKey = Object.keys(labelMapping).find(key => labelMapping[key] === label);
         const originalLabel = originalLabelKey ? originalLabelKey.split('_')[0] : label;
         const cellData = effectSizesData.find((d) => d.label === originalLabel);
+
         if (cellData) {
-            return `Cell: ${label}<br>Fold Change: ${cellData.foldChange.toFixed(2)}`;
+            const cellID = cellData.cell_id;
+            const cellName = label;
+            const foldChange = cellData.foldChange.toFixed(2);
+            const markerScore = cellData.markerScore.toFixed(1);
+
+            // Generate a URL based on cell_id
+            const cellURL = `${WEB_URL}/details-cell/${cellID}`;
+            return `<b>Cell ID:</b> <a href="${cellURL}" target="_blank">${cellID}</a><br><b>Cell Name:</b> ${cellName}<br><b>Fold Change:</b> ${foldChange}<br><b>Marker Score:</b> ${markerScore}<br>`;
+        }else {
+            return label;
         }
+
         return label;
     });
-
 
     // Step 5: Check for missing parents
     const missingParents = updatedParents.filter(
@@ -856,23 +896,22 @@ function plotGeneTreemapGrouped() {
         type: "treemap",
         labels: uniqueLabels,
         parents: updatedParents,
-        values: values,
+        values: plot_values,
         textinfo: "label+value",
         textposition: "middle center",
         marker: {
             colorscale: "Cividis",
-            colors: values, // Color based on foldChange
+            colors: plot_values, // Color based on foldChange
             showscale: true,
             colorbar: {
                 title: "Fold Change", // Update colorbar title
                 titleside: "right",
             },
         },
-        hovertemplate: "%{text}<extra></extra>", // Use custom hover text without extra box
+        hovertemplate: "%{text}<extra></extra>",
         text: hoverTexts,
     };
 
-    // Step 7: Create layout and configuration for the plot
     const layout = {
         margin: { l: 0, r: 0, t: 50, b: 0 },
         hovermode: "closest",
@@ -895,43 +934,78 @@ function plotGeneTreemapGrouped() {
         scrollZoom: true,
     };
 
-    // Step 8: Render the plot
     Plotly.newPlot("gene-treemap-grouped", [trace], layout, config).then(() => {
         hideLoadingBar();
     });
 
     const geneTreemapDivGrouped = document.getElementById("gene-treemap-grouped");
+
     geneTreemapDivGrouped.on("plotly_hover", function (eventData) {
         const pointData = eventData.points[0];
-        const groupName = pointData.label;
-        const foldChange = pointData.value;
-
-        const hoverContent = `
-            <b>Group Name:</b> ${groupName}<br>
-            <b>Sum of Fold Change:</b> ${foldChange}
-        `;
-        document.getElementById("hover-content-grouped").innerHTML = hoverContent;
+        if(pointData.text === "All Cells") {
+            return;
+        }
+        document.getElementById("hover-content-grouped").innerHTML = pointData.text;
     });
 }
 
-
 function plotGeneTreemapGroupedDetails() {
     showLoadingBar();
+
+    if (!Array.isArray(effectSizesData) || effectSizesData.length === 0) {
+        return;
+    }
+
+    // Filter effectSizesData to ensure each entry has a corresponding label and parent
+    const validEffectSizesData = effectSizesData.filter((d) => {
+        const labelExists = labels.includes(d.cell_term);
+        return labelExists;
+    });
+
+    // Map plot_labels and plot_parents based on validEffectSizesData
+    const plot_labels = validEffectSizesData.map((d) => d.cell_term);
+    const plot_parents = plot_labels.map((label) => {
+        const labelIndex = labels.indexOf(label);
+        return labelIndex !== -1 ? parents[labelIndex] : "All Cells";
+    });
+
+    // Map values based on filtered effectSizesData
+    const plot_values = validEffectSizesData.map((d) => (d.foldChange !== undefined ? parseFloat(d.foldChange) : 0));
+
+    // Create hover texts similar to plotGeneTreemapGrouped
+    const hoverTexts = validEffectSizesData.map((cellData) => {
+        const cellID = cellData.cell_id;
+        const cellName = cellData.cell_term;
+        const foldChange = cellData.foldChange.toFixed(2);
+        const markerScore = cellData.markerScore.toFixed(1);
+
+        // Generate a URL based on cell_id
+        const cellURL = `${WEB_URL}/details-cell/${cellID}`;
+
+        return `<b>Cell ID:</b> <a href="${cellURL}" target="_blank">${cellID}</a><br><b>Cell Name:</b> ${cellName}<br><b>Fold Change:</b> ${foldChange}<br><b>Marker Score:</b> ${markerScore}<br>`;
+    });
+
+    // Add hover text for the root node 'All Cells'
+    hoverTexts.unshift(`<b>All Cells</b><br>This is the root node representing all cells.`);
+
+    // Create the treemap trace
     const trace = {
         type: "treemap",
-        labels: labels,
-        parents: parents,
-        values: effectSizesData.map((d) => (d.foldChange !== undefined ? parseFloat(d.foldChange) : 0)),
+        labels: ['All Cells', ...plot_labels],  // Add 'All Cells' to labels
+        parents: ['', ...plot_parents],         // Root node has no parent
+        values: [0, ...plot_values],            // Root node has a value of 0
         textinfo: "label+value",
         marker: {
             colorscale: "Cividis",
-            colors: effectSizesData.map((d) => (d.foldChange !== undefined ? parseFloat(d.foldChange) : 0)), // Color based on foldChange
+            colors: [0, ...plot_values],        // Add color for root node
             showscale: true,
             colorbar: {
-                title: "Fold Change", // Update colorbar title
+                title: "Fold Change",
                 titleside: "right",
             },
         },
+        hovertemplate: "%{text}<extra></extra>", // Same hover template as in plotGeneTreemapGrouped
+        text: hoverTexts,
     };
 
     const layout = {
@@ -960,16 +1034,15 @@ function plotGeneTreemapGroupedDetails() {
     const geneTreemapDivGroupedDetails = document.getElementById("gene-treemap-grouped-details");
     geneTreemapDivGroupedDetails.on("plotly_hover", function (eventData) {
         const pointData = eventData.points[0];
-        const cellName = pointData.label;
-        const foldChange = pointData.value;
 
-        const hoverContent = `
-            <b>Cell Name:</b> ${cellName}<br>
-            <b>Fold Change:</b> ${foldChange}
-        `;
-        document.getElementById("hover-content-grouped-details").innerHTML = hoverContent;
+
+        if (pointData.label === "All Cells") {
+            return;
+        }
+        document.getElementById("hover-content-grouped-details").innerHTML = pointData.text;
     });
 }
+
 
 function downloadCSV(data, filename, removeKeys = []) {
     // Utility function to flatten a nested JSON object
