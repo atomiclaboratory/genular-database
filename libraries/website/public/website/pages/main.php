@@ -118,7 +118,6 @@
                                 <i class="fa fa-play"></i> Play
                             </button>
                         </div>
-                        <p class="text-muted text-right">This podcast was generated using advanced AI technology.</p>
                     </div>
                 </div>
 
