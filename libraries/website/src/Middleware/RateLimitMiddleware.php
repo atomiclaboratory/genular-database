@@ -16,7 +16,7 @@ class RateLimitMiddleware
 
     public function __invoke(Request $request, RequestHandler $handler)
     {
-        $apiKey = $request->getQueryParams()['api_key'] ?? null;
+        $apiKey = $request->getQueryParams()['api_key'] ?? $request->getHeaderLine('X-API-Key');
         $uri = $request->getUri()->getPath();
 
         // Allow unrestricted access to swagger_v1.json
