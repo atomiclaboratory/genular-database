@@ -1,3 +1,8 @@
+########################
+### genular-database ###
+########################
+
+
 # Install necessary packages
 # The following section checks if specific packages are installed, and if not, installs them.
 if (!require("Rcpp")) install.packages("Rcpp", repos = "http://cran.us.r-project.org")

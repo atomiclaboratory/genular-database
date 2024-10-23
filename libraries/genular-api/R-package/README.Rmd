@@ -406,7 +406,7 @@ search_example_7 <- fetch_all_gene_search_results(
   options = list(api_key = API_KEY, timeout = 1000)  # API key and timeout for the request
 )
 
-
+## TODO
 
 
 ```

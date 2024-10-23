@@ -1,10 +1,9 @@
 <div align="center">
-    <h1>genular<br/><sub>(gene cell repository: a comprehensive gene/cell database)</sub></h1>
+    <h1>genular<br/><sub>A Comprehensive Resource for Mapping Gene-Cell Interactions</sub></h1>
 </div>
 
 # Introduction
-Welcome to `genular`, the open-source database created for understanding biological relationships. 
-To unravel the complex interactions among genes and cells in a more comprehensive and data-driven manner. We aimed to create a user-friendly database, rich in information about genes, proteins, and cell expressions.
+Unraveling the intricate relationships between genes and cells is key to advancing our understanding of biological processes and disease mechanisms. `genular` an open-source, integrated gene-cell repository—was developed to fill the gap in current bioinformatics tools, which often struggle to capture the full complexity of gene-cell interactions at scale. Our platform unifies multi-dimensional data from gene expression, protein interactions, and single-cell RNA sequencing (scRNA-seq), providing a powerful resource for exploring the dynamic biological roles of genes across diverse cellular contexts.
 
 # Getting Started
 
